@@ -1,0 +1,63 @@
+//************************************************************************************************
+
+// body-parser: là tv tối giản hoá các dữ liệu truyền nhận; hỗ trợ lấy các tham số client truyền lên 
+// dotenv: là tv để dùng biến proj
+// ejs: views engine
+// express
+ npm install --save body-parser@1.19.0 dotenv@8.2.0 ejs@3.1.5 express@4.17.1
+
+//************************************************************************************************
+
+
+// bable : là tv cho phép biên dịch các phiên bản js khác nhau (comparer)
+// nodemon : auto restart
+  npm install --save-dev @babel/core@7.12.10 @babel/preset-env@7.12.10 
+@babel/node@7.12.10 nodemon@2.0.7
+
+
+//************************************************************************************************
+ >>>>>>>>>>cachee tạo tables (migration), thêm dữ liệu (seeder) bằng Sequelize-CLI vào cơ sở dữ liệu MySQL.
+
+// 👉 1. Cài đặt các thư viện: sequlize-cli, sequelize và mysql2
+npm install --save-dev sequelize-cli@6.2.0  (orm)
+npm install --save mysql2@2.2.5
+npm install --save sequelize@6.6.2
+
+👉2.. npx sequelize-cli init
+- create following folders
+	+ config
+	+ models
+	+ migrations
+	+ seeders
+
+👉 3. Tạo model: 
+npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string
+
+👉 4: Tạo migrations:
+4.1) .env => NODE_ENV = development
+2.2) {}config.json => development -> database: "tên database"
+npx sequelize-cli db:migrate
+
+👉5. Tạo Seeder: npx sequelize-cli seed:generate --name demo-user
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.bulkInsert('Users', [{
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'example@example.com',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }]);
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.bulkDelete('Users', null, {});
+  }
+};
+
+👉6. Running Seeds: npx sequelize-cli db:seed:all
+
+
+
+
+// chuyen code password:
+npm install --save bcryptjs@2.4.3
