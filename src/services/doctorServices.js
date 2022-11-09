@@ -1,6 +1,7 @@
 import db from '../models';
 import _ from 'lodash';
 require('dotenv').config();
+import { getAllCodesService } from '../services/userServices';
 
 let getTopDoctorHomeService = async (limit) => {
     return new Promise(async (resolve, reject) => {
@@ -82,7 +83,7 @@ let saveDetailDoctorService = (data) => {
                     });
                 }
             }
-            if (data.isChange) {
+            if (data.isChange == 'true') {
                 let doctor = await db.Markdown.findOne({ where: { doctorId: data.doctorId } });
                 if (doctor) {
                     await doctor.update({
@@ -144,7 +145,7 @@ let getDetailDoctorByIdServices = (id) => {
         try {
             let data = await db.User.findOne({
                 where: { id: id },
-                attributes: { exclude: ['password'] },
+                attributes: { exclude: ['password'], include: ['firstName', 'lastName'] },
                 include: [
                     { model: db.Markdown, attributes: ['contentHTML', 'contentMarkdown', 'description'] },
                     { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
@@ -158,6 +159,7 @@ let getDetailDoctorByIdServices = (id) => {
                             { model: db.Allcode, as: 'provinceData', attributes: ['valueEn', 'valueVi'] },
                             { model: db.Allcode, as: 'paymentData', attributes: ['keyMap', 'valueEn', 'valueVi'] },
                             { model: db.Specialty, as: 'specialtyData', attributes: ['id', 'name'] },
+                            { model: db.Clinics, as: 'clinicData', attributes: ['id', 'nameClinic'] },
                         ],
                     },
                 ],
@@ -189,6 +191,7 @@ let saveScheduleDoctorService = (data) => {
                 });
             } else {
                 let arrSchedule = data.arrSchedule;
+
                 arrSchedule.map((item) => {
                     item.maxNumber = process.env.MAX_NUMBER_SCHEDULE;
                     item.date = item.date.toString();
@@ -201,9 +204,31 @@ let saveScheduleDoctorService = (data) => {
                     raw: true,
                 });
 
+                let arrTimeTypeExisting = existing.map((item) => item.timeType);
+                let arrTimeTypeSchedule = arrSchedule.map((item) => item.timeType);
+                let toDelete = arrTimeTypeExisting.filter((item) => {
+                    if (!arrTimeTypeSchedule.includes(item)) {
+                        return item;
+                    }
+                });
+
                 let toCreate = _.differenceWith(arrSchedule, existing, (a, b) => {
                     return a.timeType === b.timeType && a.date === b.date;
                 });
+
+                if (toDelete && toDelete.length > 0) {
+                    await db.Schedule.destroy({
+                        where: {
+                            doctorId: data.doctorId,
+                            date: data.date,
+                            timeType: toDelete,
+                        },
+                    });
+                    resolve({
+                        errorCode: 0,
+                        message: 'Save schedule done',
+                    });
+                }
                 if (toCreate && toCreate.length > 0) {
                     await db.Schedule.bulkCreate(toCreate);
                     resolve({

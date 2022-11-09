@@ -4,6 +4,7 @@ import userController from '../controller/userController';
 import doctorController from '../controller/doctorController';
 import patientController from '../controller/patientController';
 import specialtyController from '../controller/specialtyController';
+import clinicController from '../controller/clinicController';
 import middlewareController from '../middleware/middlewareController';
 
 let router = express.Router();
@@ -25,6 +26,9 @@ let initWebRoutes = (app) => {
     router.put('/api/update-user', middlewareController.verifyAdmin, userController.handleUpdateUser);
     router.delete('/api/delete-user', middlewareController.verifyAdmin, userController.handleDeleteUser);
 
+    // delete schedule expired
+    // router.post('/api/delete-schedule', middlewareController.verifyDoctor, doctorController.deleteSchedule);
+
     //doctor
     router.get('/api/allcode', userController.getAllCodes);
     router.get('/api/top-doctor-home', doctorController.getTopDoctorHome);
@@ -41,6 +45,10 @@ let initWebRoutes = (app) => {
     router.post('/api/post-specialty', specialtyController.postSpecialty);
     router.get('/api/all-specialty', specialtyController.getAllSpecialty);
     router.get('/api/get-specialty-by-id', specialtyController.getSpecialtyById);
+    // detail clinic
+    router.post('/api/post-detail-clinic', clinicController.postDetailClinic);
+    router.get('/api/get-all-clinic', clinicController.getAllClinic);
+    router.get('/api/get-detail-clinic-by-id', clinicController.getDetailClinicById);
 
     return app.use('/', router);
 };

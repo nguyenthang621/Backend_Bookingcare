@@ -47,7 +47,7 @@ let getSpecialtyByIdServices = (id, location) => {
                 raw: true,
                 nest: true,
             });
-            if (data) {
+            if (data && data.image) {
                 let imagebase64 = '';
                 imagebase64 = new Buffer.from(data.image, 'base64').toString('binary');
                 data.image = imagebase64;

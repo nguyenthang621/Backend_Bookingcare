@@ -8,18 +8,25 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
-            name: {
+            nameClinic: {
                 type: Sequelize.STRING,
             },
-            address: {
+            addressClinic: {
                 type: Sequelize.STRING,
             },
-            description: {
+            descriptionHtml: {
                 type: Sequelize.TEXT,
             },
-            image: {
-                type: Sequelize.STRING,
+            descriptionMarkdown: {
+                type: Sequelize.TEXT,
             },
+            imageClinic: {
+                type: Sequelize.BLOB('long'),
+            },
+            imageLogo: {
+                type: Sequelize.BLOB('long'),
+            },
+
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE,

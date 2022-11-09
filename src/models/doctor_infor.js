@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
             Doctor_Infor.hasOne(models.Markdown, {
                 foreignKey: 'doctorId',
             });
+            Doctor_Infor.belongsTo(models.Clinics, {
+                foreignKey: 'nameClinic',
+                targetKey: 'id',
+                as: 'clinicData',
+            });
         }
     }
     Doctor_Infor.init(

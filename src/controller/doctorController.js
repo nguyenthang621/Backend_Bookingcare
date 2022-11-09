@@ -53,6 +53,7 @@ let getDetailDoctorById = async (req, res) => {
 let saveScheduleDoctor = async (req, res) => {
     try {
         let arrSchedule = req.body;
+
         let response = await doctorServices.saveScheduleDoctorService(arrSchedule);
         return res.status(200).json(response);
     } catch (error) {
@@ -60,6 +61,16 @@ let saveScheduleDoctor = async (req, res) => {
         return res.status(200).json({ errorCode: 1, message: 'save schedule doctor fail' });
     }
 };
+// let deleteSchedule = async (req, res) => {
+//     try {
+//         let arrSchedule = req.body;
+//         let response = await doctorServices.deleteScheduleService(arrSchedule);
+//         return res.status(200).json(response);
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(200).json({ errorCode: 1, message: 'delete schedule fail' });
+//     }
+// };
 
 let getScheduleDoctorByDate = async (req, res) => {
     try {
@@ -80,4 +91,5 @@ module.exports = {
     getDetailDoctorById,
     saveScheduleDoctor,
     getScheduleDoctorByDate,
+    // deleteSchedule
 };
