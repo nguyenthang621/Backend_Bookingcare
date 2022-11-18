@@ -3,13 +3,13 @@ import bcrypt from 'bcryptjs';
 
 const salt = bcrypt.genSaltSync(10);
 
-let handleUserLogin = (email, password) => {
+let handleUserLoginServices = (email, password) => {
     return new Promise(async (resolve, reject) => {
-        let isExist = await checkUserEmail(email);
-        let userData = {};
         try {
+            let isExist = await checkUserEmail(email);
+            let userData = {};
             if (isExist) {
-                let data = handleComparePassword(email, password, userData);
+                let data = handleComparePassword(email, password);
                 resolve(data);
             } else {
                 userData.errorCode = 1;
@@ -37,12 +37,12 @@ let checkUserEmail = (email) => {
     });
 };
 
-let handleComparePassword = (email, password, userData = {}) => {
+let handleComparePassword = (email, password) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await db.User.findOne({
                 // attributes: ['email', 'firstName', 'lastName', 'roleId', 'password'],
-                attributes: ['firstName', 'lastName', 'roleId', 'password'],
+                attributes: ['id', 'firstName', 'lastName', 'roleId', 'password'],
                 where: { email: email },
                 raw: true,
             });
@@ -57,8 +57,8 @@ let handleComparePassword = (email, password, userData = {}) => {
                     });
                 } else {
                     resolve({
-                        errorCode: 2,
-                        message: 'password fall',
+                        errorCode: 1,
+                        message: 'password wrong',
                     });
                 }
             } else {
@@ -79,7 +79,7 @@ let getUserById = async (userId) => {
             if (userId === 'ALL') {
                 let users = await db.User.findAll({
                     attributes: {
-                        exclude: ['password'],
+                        exclude: ['password', 'image'],
                     },
                 });
                 resolve(users);
@@ -88,7 +88,7 @@ let getUserById = async (userId) => {
                 let user = await db.User.findOne({
                     where: { id: userId },
                     attributes: {
-                        exclude: ['password'],
+                        exclude: ['password', 'image'],
                     },
                 });
                 user ? resolve(user) : resolve('');
@@ -219,7 +219,7 @@ let getAllCodesService = (typeInput) => {
     });
 };
 module.exports = {
-    handleUserLogin,
+    handleUserLoginServices,
     getUserById,
     createUser,
     deleteUser,

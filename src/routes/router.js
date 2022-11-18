@@ -5,6 +5,8 @@ import doctorController from '../controller/doctorController';
 import patientController from '../controller/patientController';
 import specialtyController from '../controller/specialtyController';
 import clinicController from '../controller/clinicController';
+import JWTController from '../controller/JWTController';
+
 import middlewareController from '../middleware/middlewareController';
 
 let router = express.Router();
@@ -20,11 +22,14 @@ let initWebRoutes = (app) => {
     router.get('/delete-user/:id', homeController.deleteUser);
 
     // api user:
-    router.post('/api/login', middlewareController.createToken);
-    router.get('/api/get-users', middlewareController.verifyDoctor, userController.handleGetUsers);
+    router.post('/api/login', userController.handleLogin);
+    router.get('/api/get-users', middlewareController.verifyToken, userController.handleGetUsers);
     router.post('/api/create-user', middlewareController.verifyAdmin, userController.handleCreateUser);
     router.put('/api/update-user', middlewareController.verifyAdmin, userController.handleUpdateUser);
     router.delete('/api/delete-user', middlewareController.verifyAdmin, userController.handleDeleteUser);
+
+    router.post('/api/refresh-token', JWTController.requestRefreshToken);
+    router.post('/api/logout', JWTController.logoutUser);
 
     // delete schedule expired
     // router.post('/api/delete-schedule', middlewareController.verifyDoctor, doctorController.deleteSchedule);

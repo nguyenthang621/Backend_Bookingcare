@@ -1,21 +1,28 @@
 import userController from '../services/userServices';
 import userServices from '../services/userServices';
+import { signAccessToken, signRefreshToken } from '../services/jwt_Services';
 
 let handleLogin = async (req, res) => {
-    let email = req.body.email;
-    let password = req.body.password;
-    // if (!email || !password) {
-    //     return res.status(500).json({ errorCode: 1, message: 'missing form' });
-    // }
-    let dataUser = await userController.handleUserLogin(email, password);
-    // let data = dataUser.errorCode === 0 ? dataUser : undefined;
-    // return res.status(200).json({
-    //     errorCode: dataUser.errorCode,
-    //     message: dataUser.message,
-    //     // token: req.body.token,
-    //     data,
-    // });
-    return dataUser;
+    let { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(401).json({ errorCode: 1, message: 'missing form' });
+    }
+    let dataUser = await userController.handleUserLoginServices(email, password);
+    if (dataUser && dataUser.errorCode === 0) {
+        let payload = dataUser.user;
+        const accessToken = await signAccessToken(payload);
+        const refreshToken = await signRefreshToken(payload);
+
+        res.cookie('refreshToken', refreshToken, {
+            // httpOnly:true,
+            secure: false,
+            path: '/',
+            sameSite: 'strict',
+        });
+        return res.status(200).json({ errorCode: 0, accessToken });
+    } else {
+        return res.status(200).json(dataUser);
+    }
 };
 
 let handleGetUsers = async (req, res) => {
