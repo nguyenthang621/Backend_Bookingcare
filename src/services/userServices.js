@@ -140,6 +140,45 @@ let createUser = async (data) => {
         }
     });
 };
+let registerServices = async (data) => {
+    let hashPassword = await handleHashPassword(data.password);
+    return new Promise(async (resolve, reject) => {
+        try {
+            // check user email is exist??
+            let checkEmail = await checkUserEmail(data.email);
+            if (checkEmail) {
+                resolve({
+                    errorCode: 1,
+                    message: 'your email is already in used, please try another email',
+                });
+            } else {
+                if (!data.email || !data.password || !data.confirmPassword) {
+                    resolve({
+                        errorCode: 1,
+                        message: 'Fill in the missing user information, please fill in all the information',
+                    });
+                } else if (data.password !== data.confirmPassword) {
+                    resolve({
+                        errorCode: 1,
+                        message: 'Confirm password wrong',
+                    });
+                } else {
+                    await db.User.create({
+                        email: data.email,
+                        password: hashPassword,
+                        roleId: 'R3',
+                    });
+                    resolve({
+                        errorCode: 0,
+                        message: 'Register done',
+                    });
+                }
+            }
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
 let handleHashPassword = (password) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -225,4 +264,5 @@ module.exports = {
     deleteUser,
     updateUser,
     getAllCodesService,
+    registerServices,
 };

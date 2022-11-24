@@ -28,6 +28,8 @@ let initWebRoutes = (app) => {
     router.put('/api/update-user', middlewareController.verifyAdmin, userController.handleUpdateUser);
     router.delete('/api/delete-user', middlewareController.verifyAdmin, userController.handleDeleteUser);
 
+    router.post('/api/register', userController.register);
+
     router.post('/api/refresh-token', JWTController.requestRefreshToken);
     router.post('/api/logout', JWTController.logoutUser);
 
@@ -42,6 +44,12 @@ let initWebRoutes = (app) => {
     router.get('/api/get-detail-doctor-by-id', doctorController.getDetailDoctorById);
     router.post('/api/save-schedule-doctor', middlewareController.verifyDoctor, doctorController.saveScheduleDoctor);
     router.get('/api/get-schedule-doctor-by-date', doctorController.getScheduleDoctorByDate);
+    router.get(
+        '/api/get-appointment-doctor',
+        middlewareController.verifyDoctor,
+        doctorController.getAppointmentDoctorByDate,
+    );
+    router.post('/api/confirm-remedy', doctorController.confirmRemedy);
 
     //patient
     router.post('/api/patient-booking-appointment', patientController.postBookAppointment);

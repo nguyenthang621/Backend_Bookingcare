@@ -50,6 +50,7 @@ let patientBookAppointmentServices = (data) => {
                         IDNumber: data.IDNumber,
                         doctorId: data.doctorId,
                         date: data.date,
+                        patientId: user.id,
                     },
                     defaults: {
                         bookFor: data.bookFor,
@@ -65,6 +66,7 @@ let patientBookAppointmentServices = (data) => {
                         address: data.address,
                         reason: data.reason,
                         uuid: uuid,
+                        patientId: user.id,
                     },
                     raw: true,
                     nest: true,

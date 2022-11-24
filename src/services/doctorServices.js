@@ -1,7 +1,8 @@
 import db from '../models';
-import _ from 'lodash';
+import _, { reject } from 'lodash';
 require('dotenv').config();
 import { getAllCodesService } from '../services/userServices';
+import { sendEmailRemedyService, sendEmailCancelAppointmentService } from '../services/emailServices';
 
 let getTopDoctorHomeService = async (limit) => {
     return new Promise(async (resolve, reject) => {
@@ -271,6 +272,80 @@ let getScheduleDoctorByDateService = (doctorId, date) => {
         }
     });
 };
+let getAppointmentDoctorByDateService = (doctorId, date, statusId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId && !date) {
+                resolve({ errorCode: 1, message: 'Missing parameter appointment' });
+            } else {
+                let data = await db.Booking.findAll({
+                    where: { doctorId: doctorId, date: date, statusId: statusId },
+                    attributes: { exclude: ['uuid'] },
+                    include: [
+                        { model: db.Allcode, as: 'timeAppointment', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'genderDT', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.User, as: 'dataAcc', attributes: ['firstName', 'email', 'lastName'] },
+                        { model: db.User, as: 'dataAccDoctor', attributes: ['firstName', 'lastName'] },
+                    ],
+                    raw: true,
+                    nest: true,
+                });
+                if (data && data.length > 0) {
+                    resolve({ errorCode: 0, data });
+                } else {
+                    resolve({ errorCode: 0, message: 'No appointment', data });
+                }
+            }
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
+let confirmRemedyServices = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.email || !data.doctorId || !data.patientId || !data.timeType) {
+                resolve({
+                    errorCode: 1,
+                    message: 'Missing parameter',
+                });
+            } else {
+                let appointment = await db.Booking.findOne({
+                    where: {
+                        doctorId: data.doctorId,
+                        patientId: data.patientId,
+                        timeType: data.timeType,
+                        statusId: 'S2',
+                    },
+                });
+                if (appointment) {
+                    if (data && data.isDestroyAppointment) {
+                        appointment.statusId = 'S4';
+                        await appointment.save();
+                        await sendEmailCancelAppointmentService(data, 'http://localhost:5000/home');
+                    } else {
+                        appointment.statusId = 'S3';
+                        await appointment.save();
+                        await sendEmailRemedyService(data, 'http://localhost:5000/home');
+                    }
+                    resolve({
+                        errorCode: 0,
+                        message: 'Confirm and send email success',
+                    });
+                } else {
+                    resolve({
+                        errorCode: 1,
+                        message: 'The patient has not confirmed the order or has canceled the order',
+                    });
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            reject(error);
+        }
+    });
+};
 
 module.exports = {
     getTopDoctorHomeService,
@@ -279,4 +354,6 @@ module.exports = {
     getDetailDoctorByIdServices,
     saveScheduleDoctorService,
     getScheduleDoctorByDateService,
+    getAppointmentDoctorByDateService,
+    confirmRemedyServices,
 };

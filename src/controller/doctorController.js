@@ -83,6 +83,29 @@ let getScheduleDoctorByDate = async (req, res) => {
         return res.status(401).json({ errorCode: 1, message: 'get schedule doctor fail' });
     }
 };
+let getAppointmentDoctorByDate = async (req, res) => {
+    try {
+        let { doctorId, date, statusId } = req.query;
+        if (!statusId) {
+            statusId = 'S3';
+        }
+        let response = await doctorServices.getAppointmentDoctorByDateService(doctorId, date, statusId);
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        return res.status(401).json({ errorCode: 1, message: 'get appointment doctor fail' });
+    }
+};
+let confirmRemedy = async (req, res) => {
+    try {
+        let data = req.body;
+        let response = await doctorServices.confirmRemedyServices(data);
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        return res.status(401).json({ errorCode: 1, message: 'Confirm remedy and send mail fail, pls again' });
+    }
+};
 
 module.exports = {
     getTopDoctorHome,
@@ -91,5 +114,7 @@ module.exports = {
     getDetailDoctorById,
     saveScheduleDoctor,
     getScheduleDoctorByDate,
+    getAppointmentDoctorByDate,
+    confirmRemedy,
     // deleteSchedule
 };

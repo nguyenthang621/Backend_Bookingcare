@@ -5,7 +5,7 @@ import { signAccessToken, signRefreshToken } from '../services/jwt_Services';
 let handleLogin = async (req, res) => {
     let { email, password } = req.body;
     if (!email || !password) {
-        return res.status(401).json({ errorCode: 1, message: 'missing form' });
+        return res.status(200).json({ errorCode: 1, message: 'Missing form' });
     }
     let dataUser = await userController.handleUserLoginServices(email, password);
     if (dataUser && dataUser.errorCode === 0) {
@@ -44,9 +44,14 @@ let handleGetUsers = async (req, res) => {
 };
 
 let handleCreateUser = async (req, res) => {
-    let message = await userServices.createUser(req.body);
-    console.log(message);
-    return res.status(200).json(message);
+    try {
+        let message = await userServices.createUser(req.body);
+        console.log(message);
+        return res.status(200).json(message);
+    } catch (error) {
+        console.log(error);
+        res.status(401).json({ errorCode: -1, message: 'create fail, pls again' });
+    }
 };
 
 let handleUpdateUser = async (req, res) => {
@@ -69,6 +74,16 @@ let getAllCodes = async (req, res) => {
         res.status(200).json({ errorCode: -1, message: 'get data from database fail' });
     }
 };
+let register = async (req, res) => {
+    try {
+        let data = req.body;
+        let response = await userServices.registerServices(data);
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('register fail ', error);
+        res.status(200).json({ errorCode: -1, message: 'Register fail, pls again' });
+    }
+};
 
 module.exports = {
     handleLogin,
@@ -77,4 +92,5 @@ module.exports = {
     handleUpdateUser,
     handleDeleteUser,
     getAllCodes,
+    register,
 };
