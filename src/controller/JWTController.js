@@ -8,7 +8,7 @@ let requestRefreshToken = async (req, res) => {
         let refreshToken = req.cookies?.refreshToken;
 
         if (!refreshToken || _.isEmpty(refreshToken)) {
-            return res.status(401).json({ errorCode: 1, message: 'You are not authenticated' });
+            return res.status(200).json({ errorCode: 1, message: 'You are not authenticated' });
         }
 
         let payload = await verifyRefreshToken(refreshToken);
@@ -31,7 +31,7 @@ let requestRefreshToken = async (req, res) => {
             accessToken: newAccessToken,
         });
     } catch (error) {
-        return res.status(401).json({ errorCode: 1, message: 'Error from server' });
+        return res.status(200).json({ errorCode: 1, message: 'Error from server' });
     }
 };
 
@@ -39,7 +39,7 @@ let logoutUser = async (req, res) => {
     try {
         let refreshToken = req.body.refreshToken;
         if (!refreshToken) {
-            return res.status(401).json({
+            return res.status(200).json({
                 errorCode: 1,
                 message: 'Missing refreshToken',
             });

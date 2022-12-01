@@ -10,10 +10,13 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             User.belongsTo(models.Allcode, { foreignKey: 'position', targetKey: 'keyMap', as: 'positionData' });
             User.belongsTo(models.Allcode, { foreignKey: 'gender', targetKey: 'keyMap', as: 'genderData' });
+            User.belongsTo(models.Allcode, { foreignKey: 'roleId', targetKey: 'keyMap', as: 'roleData' });
             User.hasOne(models.Markdown, { foreignKey: 'doctorId' });
             User.hasOne(models.Doctor_Infor, { foreignKey: 'doctorId' });
             User.hasMany(models.Booking, { foreignKey: 'patientId', as: 'dataAcc' });
             User.hasMany(models.Booking, { foreignKey: 'doctorId', as: 'dataAccDoctor' });
+            User.hasMany(models.Handbook, { foreignKey: 'senderId', as: 'senderData' });
+            User.hasMany(models.News, { foreignKey: 'senderId', as: 'senderDataNews' });
         }
     }
     User.init(

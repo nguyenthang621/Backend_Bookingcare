@@ -42,6 +42,19 @@ let handleGetUsers = async (req, res) => {
         users,
     });
 };
+let handleGetDetailUsers = async (req, res) => {
+    try {
+        let accessToken = req.headers.accesstoken;
+        let response = await userServices.handleGetDetailUsersServices(accessToken);
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        return res.status(200).json({
+            errorCode: 1,
+            message: 'Error from server',
+        });
+    }
+};
 
 let handleCreateUser = async (req, res) => {
     try {
@@ -50,7 +63,7 @@ let handleCreateUser = async (req, res) => {
         return res.status(200).json(message);
     } catch (error) {
         console.log(error);
-        res.status(401).json({ errorCode: -1, message: 'create fail, pls again' });
+        res.status(200).json({ errorCode: 1, message: 'create fail, pls again' });
     }
 };
 
@@ -71,7 +84,7 @@ let getAllCodes = async (req, res) => {
         res.status(200).json(data);
     } catch (error) {
         console.log('get all codes failed: ', error);
-        res.status(200).json({ errorCode: -1, message: 'get data from database fail' });
+        res.status(200).json({ errorCode: 1, message: 'get data from database fail' });
     }
 };
 let register = async (req, res) => {
@@ -81,7 +94,7 @@ let register = async (req, res) => {
         res.status(200).json(response);
     } catch (error) {
         console.log('register fail ', error);
-        res.status(200).json({ errorCode: -1, message: 'Register fail, pls again' });
+        res.status(200).json({ errorCode: 1, message: 'Register fail, pls again' });
     }
 };
 
@@ -93,4 +106,5 @@ module.exports = {
     handleDeleteUser,
     getAllCodes,
     register,
+    handleGetDetailUsers,
 };

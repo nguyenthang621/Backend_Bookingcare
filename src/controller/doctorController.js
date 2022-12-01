@@ -53,8 +53,9 @@ let getDetailDoctorById = async (req, res) => {
 let saveScheduleDoctor = async (req, res) => {
     try {
         let arrSchedule = req.body;
+        let accessToken = req.headers.accesstoken;
 
-        let response = await doctorServices.saveScheduleDoctorService(arrSchedule);
+        let response = await doctorServices.saveScheduleDoctorService(arrSchedule, accessToken);
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
@@ -80,7 +81,7 @@ let getScheduleDoctorByDate = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(401).json({ errorCode: 1, message: 'get schedule doctor fail' });
+        return res.status(200).json({ errorCode: 1, message: 'get schedule doctor fail' });
     }
 };
 let getAppointmentDoctorByDate = async (req, res) => {
@@ -93,7 +94,7 @@ let getAppointmentDoctorByDate = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(401).json({ errorCode: 1, message: 'get appointment doctor fail' });
+        return res.status(200).json({ errorCode: 1, message: 'get appointment doctor fail' });
     }
 };
 let confirmRemedy = async (req, res) => {
@@ -103,7 +104,7 @@ let confirmRemedy = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(401).json({ errorCode: 1, message: 'Confirm remedy and send mail fail, pls again' });
+        return res.status(200).json({ errorCode: 1, message: 'Confirm remedy and send mail fail, pls again' });
     }
 };
 

@@ -1,6 +1,8 @@
 import db from '../models';
 import _, { reject } from 'lodash';
 require('dotenv').config();
+import jwt from 'jsonwebtoken';
+
 import { getAllCodesService } from '../services/userServices';
 import { sendEmailRemedyService, sendEmailCancelAppointmentService } from '../services/emailServices';
 
@@ -11,20 +13,34 @@ let getTopDoctorHomeService = async (limit) => {
                 limit: limit,
                 where: { roleId: 'R2' },
                 order: [['createdAt', 'DESC']],
-                attributes: { exclude: ['password'] },
+                // attributes: { exclude: ['password'] },
+                attributes: ['id', 'firstName', 'lastName', 'image', 'email'],
                 include: [
                     { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
                     { model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi'] },
+                    {
+                        model: db.Doctor_Infor,
+                        attributes: ['id', 'doctorId', 'specialtyId', 'nameClinic'],
+                    },
                 ],
                 raw: true,
                 nest: true,
             });
+
             if (!doctors) {
                 resolve({
                     errorCode: 1,
                     message: 'cant get top doctor',
                 });
             } else {
+                if (doctors && doctors.length > 0) {
+                    doctors.map((item) => {
+                        let imagebase64 = '';
+                        imagebase64 = new Buffer.from(item.image, 'base64').toString('binary');
+                        item.image = imagebase64;
+                        return item;
+                    });
+                }
                 resolve({
                     errorCode: 0,
                     data: doctors,
@@ -41,7 +57,20 @@ let getAllDoctorsServices = () => {
         try {
             let allDoctor = await db.User.findAll({
                 where: { roleId: 'R2' },
-                attributes: { exclude: ['password', 'image'] },
+                attributes: {
+                    exclude: [
+                        'email',
+                        'createdAt',
+                        'address',
+                        'image',
+                        'password',
+                        'phoneNumber',
+                        'position',
+                        'roleId',
+                        'updatedAt',
+                    ],
+                },
+                raw: true,
             });
             if (!allDoctor) {
                 resolve({
@@ -182,13 +211,23 @@ let getDetailDoctorByIdServices = (id) => {
     });
 };
 
-let saveScheduleDoctorService = (data) => {
+let saveScheduleDoctorService = (data, accessToken) => {
     return new Promise(async (resolve, reject) => {
         try {
+            if (!data.doctorId) {
+                if (accessToken) {
+                    jwt.verify(accessToken, process.env.KEY_SECRET_ACCESS_TOKEN, (err, payload) => {
+                        if (err) {
+                            resolve({ errorCode: 1, message: 'token is not valid' });
+                        }
+                        data.doctorId = +payload.id;
+                    });
+                }
+            }
             if (!data.doctorId && !data.date && !data.arrSchedule) {
                 resolve({
-                    errorCode: -1,
-                    message: 'missing information',
+                    errorCode: 1,
+                    message: 'Missing information',
                 });
             } else {
                 let arrSchedule = data.arrSchedule;
@@ -196,6 +235,7 @@ let saveScheduleDoctorService = (data) => {
                 arrSchedule.map((item) => {
                     item.maxNumber = process.env.MAX_NUMBER_SCHEDULE;
                     item.date = item.date.toString();
+                    item.doctorId = data.doctorId;
                     return item;
                 });
 
@@ -230,6 +270,7 @@ let saveScheduleDoctorService = (data) => {
                         message: 'Save schedule done',
                     });
                 }
+
                 if (toCreate && toCreate.length > 0) {
                     await db.Schedule.bulkCreate(toCreate);
                     resolve({

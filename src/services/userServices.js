@@ -1,5 +1,6 @@
 import db from '../models';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -242,7 +243,7 @@ let getAllCodesService = (typeInput) => {
         try {
             if (!typeInput) {
                 resolve({
-                    errorCode: -1,
+                    errorCode: 1,
                     message: "missing parameter 'type'",
                 });
             } else {
@@ -257,6 +258,44 @@ let getAllCodesService = (typeInput) => {
         }
     });
 };
+let handleGetDetailUsersServices = (accessToken) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let userId = '';
+            if (accessToken) {
+                jwt.verify(accessToken, process.env.KEY_SECRET_ACCESS_TOKEN, (err, payload) => {
+                    if (err) {
+                        resolve({ errorCode: 1, message: 'token is not valid' });
+                    }
+                    userId = payload.id;
+                });
+            } else {
+                resolve({ errorCode: 1, message: 'You are not authenticated' });
+            }
+            if (userId) {
+                let dataUser = await db.User.findOne({
+                    where: { id: userId },
+                    include: [
+                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'roleData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Booking, as: 'dataAcc' },
+                    ],
+                    attributes: { exclude: ['password'] },
+                });
+                if (dataUser && dataUser.image) {
+                    let imagebase64 = '';
+                    imagebase64 = new Buffer.from(dataUser.image, 'base64').toString('binary');
+                    dataUser.image = imagebase64;
+                }
+                resolve({ errorCode: 0, data: dataUser });
+            }
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 module.exports = {
     handleUserLoginServices,
     getUserById,
@@ -265,4 +304,5 @@ module.exports = {
     updateUser,
     getAllCodesService,
     registerServices,
+    handleGetDetailUsersServices,
 };

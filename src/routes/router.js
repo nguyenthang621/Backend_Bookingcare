@@ -2,6 +2,8 @@ import express from 'express';
 import homeController from '../controller/homeController';
 import userController from '../controller/userController';
 import doctorController from '../controller/doctorController';
+import handbookController from '../controller/handbookController';
+import newsController from '../controller/newsController';
 import patientController from '../controller/patientController';
 import specialtyController from '../controller/specialtyController';
 import clinicController from '../controller/clinicController';
@@ -32,6 +34,7 @@ let initWebRoutes = (app) => {
 
     router.post('/api/refresh-token', JWTController.requestRefreshToken);
     router.post('/api/logout', JWTController.logoutUser);
+    router.get('/api/get-detail-users', middlewareController.verifyToken, userController.handleGetDetailUsers);
 
     // delete schedule expired
     // router.post('/api/delete-schedule', middlewareController.verifyDoctor, doctorController.deleteSchedule);
@@ -62,6 +65,19 @@ let initWebRoutes = (app) => {
     router.post('/api/post-detail-clinic', clinicController.postDetailClinic);
     router.get('/api/get-all-clinic', clinicController.getAllClinic);
     router.get('/api/get-detail-clinic-by-id', clinicController.getDetailClinicById);
+    // handbook:
+    router.post('/api/post-handbook', middlewareController.verifyDoctor, handbookController.postHandbook);
+    router.get('/api/get-handbook', handbookController.getHandbook);
+    router.post('/api/confirm-handbook', middlewareController.verifyAdmin, handbookController.confirmHandbook);
+    router.post('/api/delete-handbook', middlewareController.verifyAdmin, handbookController.deleteHandbook);
+    router.get('/api/check-queue-handbook', middlewareController.verifyDoctor, handbookController.checkQueueHandbook);
+
+    // news:
+    router.post('/api/post-news', middlewareController.verifyDoctor, newsController.postNews);
+    router.get('/api/get-news', newsController.getNews);
+    router.post('/api/confirm-news', middlewareController.verifyAdmin, newsController.confirmNews);
+    router.post('/api/delete-news', middlewareController.verifyAdmin, newsController.deleteNews);
+    router.get('/api/check-queue-news', middlewareController.verifyDoctor, newsController.checkQueueNews);
 
     return app.use('/', router);
 };

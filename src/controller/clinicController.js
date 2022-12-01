@@ -13,7 +13,7 @@ let postDetailClinic = async (req, res) => {
         ];
         for (let i = 0; i < dataInput.length; i++) {
             if (!data[dataInput[i]]) {
-                return res.status(401).json({
+                return res.status(200).json({
                     errorCode: 1,
                     message: `Missing ${dataInput[i]}`,
                 });
@@ -22,8 +22,8 @@ let postDetailClinic = async (req, res) => {
         let message = await clinicServices.postDetailClinicServices(data);
         return res.status(200).json(message);
     } catch (error) {
-        return res.status(401).json({
-            errorCode: -1,
+        return res.status(200).json({
+            errorCode: 1,
             message: 'Error from server',
         });
     }
@@ -35,8 +35,8 @@ let getAllClinic = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(401).json({
-            errorCode: -1,
+        return res.status(200).json({
+            errorCode: 1,
             message: 'Error from server',
         });
     }
@@ -46,7 +46,7 @@ let getDetailClinicById = async (req, res) => {
     try {
         let id = req.query.id;
         if (!id) {
-            return res.status(401).json({
+            return res.status(200).json({
                 errorCode: 1,
                 message: 'Missing parameter',
             });
@@ -57,7 +57,7 @@ let getDetailClinicById = async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(200).json({
-            errorCode: -1,
+            errorCode: 1,
             message: 'Error from server',
         });
     }
