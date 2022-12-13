@@ -25,14 +25,7 @@ let getAllSpecialtyServices = () => {
             let data = await db.Specialty.findAll({
                 attributes: ['id', 'name', 'image'],
             });
-            if (data && data.length > 0) {
-                data.map((item) => {
-                    let imagebase64 = '';
-                    imagebase64 = new Buffer.from(item.image, 'base64').toString('binary');
-                    item.image = imagebase64;
-                    return item;
-                });
-            }
+
             resolve({ errorCode: 0, data });
         } catch (error) {
             reject(error);
@@ -49,11 +42,7 @@ let getSpecialtyByIdServices = (id, location) => {
                 raw: true,
                 nest: true,
             });
-            if (data && data.image) {
-                let imagebase64 = '';
-                imagebase64 = new Buffer.from(data.image, 'base64').toString('binary');
-                data.image = imagebase64;
-            }
+
             if (data) {
                 if (location === 'ALL') {
                     doctorsInfor = await db.Doctor_Infor.findAll({

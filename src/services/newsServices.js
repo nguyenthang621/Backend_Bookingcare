@@ -98,11 +98,6 @@ let getNewsServices = (id, type, statusId) => {
                     where: { id: id },
                 });
 
-                if (data && data.image) {
-                    let imagebase64 = '';
-                    imagebase64 = new Buffer.from(data.image, 'base64').toString('binary');
-                    data.image = imagebase64;
-                }
                 // for api manage
             } else if (type === 'manage' && statusId) {
                 data = await db.News.findAll({
@@ -118,16 +113,6 @@ let getNewsServices = (id, type, statusId) => {
                     raw: true,
                     nest: true,
                 });
-                if (data && data.length > 0) {
-                    data.map((item) => {
-                        if (item.image) {
-                            let imagebase64 = '';
-                            imagebase64 = new Buffer.from(item.image, 'base64').toString('binary');
-                            item.image = imagebase64;
-                        }
-                        return item;
-                    });
-                }
             } else {
                 //for api homepage
                 data = await db.News.findAll({
@@ -135,16 +120,6 @@ let getNewsServices = (id, type, statusId) => {
                     attributes: ['id', 'title', 'image', 'type', 'focus'],
                     raw: true,
                 });
-                if (data && data.length > 0) {
-                    data.map((item) => {
-                        if (item.image) {
-                            let imagebase64 = '';
-                            imagebase64 = new Buffer.from(item.image, 'base64').toString('binary');
-                            item.image = imagebase64;
-                        }
-                        return item;
-                    });
-                }
             }
             if (data) {
                 resolve({
@@ -177,7 +152,7 @@ let deleteNewsServices = (id) => {
                 if (news) {
                     await news.update({ statusId: 'S3' });
                     await news.save();
-                    resolve({ errorCode: 0, message: 'Not accept news success' });
+                    resolve({ errorCode: 0, message: 'Delete news success' });
                 } else {
                     resolve({ errorCode: 1, message: 'Not found news' });
                 }

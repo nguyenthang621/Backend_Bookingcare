@@ -59,7 +59,6 @@ let handleGetDetailUsers = async (req, res) => {
 let handleCreateUser = async (req, res) => {
     try {
         let message = await userServices.createUser(req.body);
-        console.log(message);
         return res.status(200).json(message);
     } catch (error) {
         console.log(error);

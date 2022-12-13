@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 const salt = bcrypt.genSaltSync(10);
 
 let handleUserLoginServices = (email, password) => {
+    console.log(email, password);
     return new Promise(async (resolve, reject) => {
         try {
             let isExist = await checkUserEmail(email);
@@ -128,8 +129,9 @@ let createUser = async (data) => {
                         gender: data.gender,
                         position: data.position,
                         roleId: data.roleId,
-                        image: data.avatar,
+                        imageURL: data.fileURL,
                     });
+
                     resolve({
                         errorCode: 0,
                         message: 'create user done',
@@ -226,7 +228,7 @@ let updateUser = async (dataUserNew) => {
                     position: dataUserNew.position,
                     phoneNumber: dataUserNew.phoneNumber,
                     gender: dataUserNew.gender,
-                    image: dataUserNew.avatar,
+                    imageURL: dataUserNew.fileURL,
                 });
                 await user.save();
                 resolve({ errorCode: 0, message: 'update user done' });
@@ -283,11 +285,7 @@ let handleGetDetailUsersServices = (accessToken) => {
                     ],
                     attributes: { exclude: ['password'] },
                 });
-                if (dataUser && dataUser.image) {
-                    let imagebase64 = '';
-                    imagebase64 = new Buffer.from(dataUser.image, 'base64').toString('binary');
-                    dataUser.image = imagebase64;
-                }
+
                 resolve({ errorCode: 0, data: dataUser });
             }
         } catch (error) {

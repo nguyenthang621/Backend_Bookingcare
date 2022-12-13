@@ -40,7 +40,7 @@ let logoutUser = async (req, res) => {
         let refreshToken = req.body.refreshToken;
         if (!refreshToken) {
             return res.status(200).json({
-                errorCode: 1,
+                errorCode: 0,
                 message: 'Missing refreshToken',
             });
         }

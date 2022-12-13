@@ -31,14 +31,6 @@ let getAllClinicServices = async (isGetImageClinic) => {
                     attributes: ['id', 'nameClinic', 'imageClinic'],
                     raw: true,
                 });
-                if (data && data.length > 0) {
-                    data.map((item) => {
-                        let imagebase64 = '';
-                        imagebase64 = new Buffer.from(item.imageClinic, 'base64').toString('binary');
-                        item.imageClinic = imagebase64;
-                        return item;
-                    });
-                }
             } else {
                 data = await db.Clinics.findAll({
                     attributes: ['id', 'nameClinic'],
@@ -82,14 +74,7 @@ let getDetailClinicByIdServices = (id) => {
                 if (doctors && !_.isEmpty(doctors)) {
                     data.doctors = doctors;
                 }
-                if (data && data.imageClinic && data.imageLogo) {
-                    let imageClinicbase64 = '';
-                    let imageLogobase64 = '';
-                    imageClinicbase64 = new Buffer.from(data.imageClinic, 'base64').toString('binary');
-                    imageLogobase64 = new Buffer.from(data.imageLogo, 'base64').toString('binary');
-                    data.imageClinic = imageClinicbase64;
-                    data.imageLogo = imageLogobase64;
-                }
+
                 resolve({
                     errorCode: 0,
                     data: data,

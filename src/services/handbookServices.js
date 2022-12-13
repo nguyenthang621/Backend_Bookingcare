@@ -87,11 +87,6 @@ let getHandbookServices = (id, type, statusId) => {
                     where: { id: id },
                 });
 
-                if (data && data.image) {
-                    let imagebase64 = '';
-                    imagebase64 = new Buffer.from(data.image, 'base64').toString('binary');
-                    data.image = imagebase64;
-                }
                 // for api manage
             } else if (type === 'manage' && statusId) {
                 data = await db.Handbook.findAll({
@@ -103,16 +98,6 @@ let getHandbookServices = (id, type, statusId) => {
                     raw: true,
                     nest: true,
                 });
-                if (data && data.length > 0) {
-                    data.map((item) => {
-                        if (item.image) {
-                            let imagebase64 = '';
-                            imagebase64 = new Buffer.from(item.image, 'base64').toString('binary');
-                            item.image = imagebase64;
-                        }
-                        return item;
-                    });
-                }
             } else {
                 //for api homepage
                 data = await db.Handbook.findAll({
@@ -120,16 +105,6 @@ let getHandbookServices = (id, type, statusId) => {
                     attributes: ['id', 'title', 'image'],
                     raw: true,
                 });
-                if (data && data.length > 0) {
-                    data.map((item) => {
-                        if (item.image) {
-                            let imagebase64 = '';
-                            imagebase64 = new Buffer.from(item.image, 'base64').toString('binary');
-                            item.image = imagebase64;
-                        }
-                        return item;
-                    });
-                }
             }
             if (data) {
                 resolve({

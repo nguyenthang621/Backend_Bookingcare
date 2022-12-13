@@ -14,7 +14,7 @@ let getTopDoctorHomeService = async (limit) => {
                 where: { roleId: 'R2' },
                 order: [['createdAt', 'DESC']],
                 // attributes: { exclude: ['password'] },
-                attributes: ['id', 'firstName', 'lastName', 'image', 'email'],
+                attributes: ['id', 'firstName', 'lastName', 'imageURL', 'email'],
                 include: [
                     { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
                     { model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi'] },
@@ -33,14 +33,6 @@ let getTopDoctorHomeService = async (limit) => {
                     message: 'cant get top doctor',
                 });
             } else {
-                if (doctors && doctors.length > 0) {
-                    doctors.map((item) => {
-                        let imagebase64 = '';
-                        imagebase64 = new Buffer.from(item.image, 'base64').toString('binary');
-                        item.image = imagebase64;
-                        return item;
-                    });
-                }
                 resolve({
                     errorCode: 0,
                     data: doctors,
@@ -113,17 +105,16 @@ let saveDetailDoctorService = (data) => {
                     });
                 }
             }
-            if (data.isChange == 'true') {
-                let doctor = await db.Markdown.findOne({ where: { doctorId: data.doctorId } });
-                if (doctor) {
-                    await doctor.update({
-                        contentHTML: data.contentHTML,
-                        contentMarkdown: data.contentMarkdown,
-                        description: data.description,
-                        doctorId: data.doctorId,
-                    });
-                    await doctor.save();
-                }
+            let doctor = await db.Markdown.findOne({ where: { doctorId: data.doctorId } });
+
+            if (doctor) {
+                await doctor.update({
+                    contentHTML: data.contentHTML,
+                    contentMarkdown: data.contentMarkdown,
+                    description: data.description,
+                    doctorId: data.doctorId,
+                });
+                await doctor.save();
             } else {
                 await db.Markdown.create({
                     contentHTML: data.contentHTML,
@@ -196,11 +187,11 @@ let getDetailDoctorByIdServices = (id) => {
                 raw: true,
                 nest: true,
             });
-            if (data && data.image) {
-                let imagebase64 = '';
-                imagebase64 = new Buffer.from(data.image, 'base64').toString('binary');
-                data.image = imagebase64;
-            }
+            // if (data && data.image) {
+            //     let imagebase64 = '';
+            //     imagebase64 = new Buffer.from(data.image, 'base64').toString('binary');
+            //     data.image = imagebase64;
+            // }
             resolve({
                 errorCode: 0,
                 data,

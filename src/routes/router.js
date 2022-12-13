@@ -43,7 +43,7 @@ let initWebRoutes = (app) => {
     router.get('/api/allcode', userController.getAllCodes);
     router.get('/api/top-doctor-home', doctorController.getTopDoctorHome);
     router.get('/api/get-all-doctor', doctorController.getAllDoctors);
-    router.post('/api/save-detail-doctor', doctorController.saveDetailDoctor);
+    router.post('/api/save-detail-doctor', middlewareController.verifyAdmin, doctorController.saveDetailDoctor);
     router.get('/api/get-detail-doctor-by-id', doctorController.getDetailDoctorById);
     router.post('/api/save-schedule-doctor', middlewareController.verifyDoctor, doctorController.saveScheduleDoctor);
     router.get('/api/get-schedule-doctor-by-date', doctorController.getScheduleDoctorByDate);

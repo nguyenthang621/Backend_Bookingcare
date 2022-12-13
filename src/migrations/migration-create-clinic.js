@@ -9,10 +9,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
             },
             nameClinic: {
-                type: Sequelize.STRING,
+                type: Sequelize.TEXT,
             },
             addressClinic: {
-                type: Sequelize.STRING,
+                type: Sequelize.TEXT,
             },
             descriptionHtml: {
                 type: Sequelize.TEXT,
