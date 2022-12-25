@@ -1,10 +1,10 @@
 'use strict';
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.createTable('handbooks', {
+        await queryInterface.createTable('Handbooks', {
             id: {
                 allowNull: false,
-                autoIncrement: true,
+                // autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
@@ -33,7 +33,7 @@ module.exports = {
                 type: Sequelize.TEXT,
             },
             image: {
-                type: Sequelize.BLOB('long'),
+                type: Sequelize.TEXT,
             },
             createdAt: {
                 allowNull: false,

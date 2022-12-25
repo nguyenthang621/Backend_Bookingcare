@@ -187,11 +187,6 @@ let getDetailDoctorByIdServices = (id) => {
                 raw: true,
                 nest: true,
             });
-            // if (data && data.image) {
-            //     let imagebase64 = '';
-            //     imagebase64 = new Buffer.from(data.image, 'base64').toString('binary');
-            //     data.image = imagebase64;
-            // }
             resolve({
                 errorCode: 0,
                 data,
