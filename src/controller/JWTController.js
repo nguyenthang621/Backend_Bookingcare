@@ -46,6 +46,7 @@ let logoutUser = async (req, res) => {
         }
         let payload = await verifyRefreshToken(refreshToken);
         let userId = payload.id;
+
         client.del(userId.toString(), (err, reply) => {
             if (err)
                 return res.status(402).json({
