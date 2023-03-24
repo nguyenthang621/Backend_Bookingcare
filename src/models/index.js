@@ -12,7 +12,7 @@ let sequelize;
 const customizeConfig = {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'postgres',
+    dialect: process.env.DB_DIALECT,
     logging: false,
     dialectOptions:
         process.env.DB_SSL === 'true'

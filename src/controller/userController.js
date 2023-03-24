@@ -79,13 +79,15 @@ let handleDeleteUser = async (req, res) => {
 let getAllCodes = async (req, res) => {
     try {
         let type = req.query.type;
-        let data = await userServices.getAllCodesService(type);
-        res.status(200).json(data);
+        let data = await userServices.getAllCodesService(type.toUpperCase());
+        if (data && data.data.length > 0) return res.status(200).json(data);
+        return res.status(400).json({ errorCode: 1, message: 'get data from database fail' });
     } catch (error) {
         console.log('get all codes failed: ', error);
-        res.status(200).json({ errorCode: 1, message: 'get data from database fail' });
+        return res.status(500).json({ errorCode: 1, message: 'get data from database fail' });
     }
 };
+
 let register = async (req, res) => {
     try {
         let data = req.body;
@@ -97,6 +99,19 @@ let register = async (req, res) => {
     }
 };
 
+let handleFilterUser = async (req, res) => {
+    try {
+        let { page, limit, keyword } = req.query;
+        const offset = !page || +page <= 1 ? 0 : (+page - 1) * limit;
+        limit = +limit || 10;
+        let response = await userServices.filterAndPagingServices({ offset, limit, keyword });
+        if (response && response.errorCode === 0) return res.status(200).json(response);
+        else {
+            return res.status(500).json(response);
+        }
+    } catch (error) {}
+};
+
 module.exports = {
     handleLogin,
     handleGetUsers,
@@ -106,4 +121,5 @@ module.exports = {
     getAllCodes,
     register,
     handleGetDetailUsers,
+    handleFilterUser,
 };

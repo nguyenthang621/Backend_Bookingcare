@@ -55,7 +55,6 @@ let saveScheduleDoctor = async (req, res) => {
     try {
         let arrSchedule = req.body;
         let accessToken = req.headers.accesstoken;
-
         let response = await doctorServices.saveScheduleDoctorService(arrSchedule, accessToken);
         return res.status(200).json(response);
     } catch (error) {

@@ -13,7 +13,6 @@ let getTopDoctorHomeService = async (limit) => {
                 limit: limit,
                 where: { roleId: 'R2' },
                 order: [['createdAt', 'DESC']],
-                // attributes: { exclude: ['password'] },
                 attributes: ['id', 'firstName', 'lastName', 'imageURL', 'email'],
                 include: [
                     { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
@@ -87,7 +86,7 @@ let saveDetailDoctorService = (data) => {
             const listData = [
                 'doctorId',
                 'contentHTML',
-                'contentMarkdown',
+                // 'contentMarkdown',
                 'selectedPrice',
                 'selectedPayment',
                 'selectedProvince',
@@ -95,7 +94,7 @@ let saveDetailDoctorService = (data) => {
                 'nameClinic',
                 'addressClinic',
                 'note',
-                'isChange',
+                // 'isChange',
             ];
             for (let i = 0; i < listData.length; i++) {
                 if (!data[listData[i]]) {
@@ -110,7 +109,7 @@ let saveDetailDoctorService = (data) => {
             if (doctor) {
                 await doctor.update({
                     contentHTML: data.contentHTML,
-                    contentMarkdown: data.contentMarkdown,
+                    // contentMarkdown: 'contentMarkdown',
                     description: data.description,
                     doctorId: data.doctorId,
                 });
@@ -118,7 +117,7 @@ let saveDetailDoctorService = (data) => {
             } else {
                 await db.Markdown.create({
                     contentHTML: data.contentHTML,
-                    contentMarkdown: data.contentMarkdown,
+                    // contentMarkdown: 'contentMarkdown',
                     description: data.description,
                     doctorId: data.doctorId,
                 });
@@ -129,7 +128,7 @@ let saveDetailDoctorService = (data) => {
             });
             if (doctorInfor) {
                 await doctorInfor.update({
-                    doctorId: data.doctorId,
+                    // doctorId: data.doctorId,
                     priceId: data.selectedPrice,
                     paymentId: data.selectedPayment,
                     provinceId: data.selectedProvince,
@@ -153,7 +152,7 @@ let saveDetailDoctorService = (data) => {
             }
             resolve({
                 errorCode: 0,
-                message: 'save doctor information done',
+                message: 'Thêm thông tin bác sĩ thành công.',
             });
         } catch (error) {
             reject(error);

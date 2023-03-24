@@ -3,7 +3,8 @@ import db from '../models';
 let postSpecialtyServices = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.descriptionHtml || !data.descriptionMarkdown || !data.image || !data.specialty) {
+            console.log(data);
+            if (!data.descriptionHtml || !data.image || !data.specialty) {
                 resolve({ errorCode: 1, message: 'Missing parameter' });
             } else {
                 await db.Specialty.create({
@@ -13,7 +14,7 @@ let postSpecialtyServices = (data) => {
                     image: data.image,
                 });
             }
-            resolve({ errorCode: 0, message: 'Save specialty success' });
+            resolve({ errorCode: 0, message: 'Lưu chuyên khoa thành công.' });
         } catch (error) {
             reject(error);
         }

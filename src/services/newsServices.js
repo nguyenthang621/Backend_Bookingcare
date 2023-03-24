@@ -6,15 +6,7 @@ require('dotenv').config();
 let postNewsServices = (data, accessToken) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (
-                !data.type ||
-                !data.title ||
-                !data.authors ||
-                !data.contentMarkdown ||
-                !data.image ||
-                !data.topic ||
-                !data.htmlFocus
-            ) {
+            if (!data.type || !data.title || !data.authors || !data.image || !data.topic || !data.htmlFocus) {
                 resolve({
                     errorCode: 1,
                     message: 'Missing parameter',

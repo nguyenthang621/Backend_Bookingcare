@@ -14,7 +14,7 @@ let postDetailClinicServices = async (data) => {
             });
             resolve({
                 errorCode: 0,
-                message: 'Create clinic success',
+                message: 'Tạo phòng khám thành công.',
             });
         } catch (error) {
             reject(error);

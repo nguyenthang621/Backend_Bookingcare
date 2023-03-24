@@ -35,6 +35,7 @@ let initWebRoutes = (app) => {
     router.post('/api/refresh-token', JWTController.requestRefreshToken);
     router.post('/api/logout', JWTController.logoutUser);
     router.get('/api/get-detail-users', middlewareController.verifyToken, userController.handleGetDetailUsers);
+    router.get('/api/filter-user', middlewareController.verifyToken, userController.handleFilterUser);
 
     // delete schedule expired
     // router.post('/api/delete-schedule', middlewareController.verifyDoctor, doctorController.deleteSchedule);

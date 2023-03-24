@@ -1,6 +1,7 @@
 import db from '../models';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -196,6 +197,7 @@ let handleHashPassword = (password) => {
 let deleteUser = async (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
+            if (!userId) resolve({ errorCode: 1, message: 'Không tìm thấy ID người dùng, hoặc người dùng đã bị xoá' });
             let user = await db.User.findOne({ where: { id: userId } });
             if (user) {
                 await user.destroy();
@@ -250,9 +252,9 @@ let getAllCodesService = (typeInput) => {
                 });
             } else {
                 let res = {};
-                let allcode = await db.Allcode.findAll({ where: { type: typeInput }, raw: true });
+                let allcodes = await db.Allcode.findAll({ where: { type: typeInput }, raw: true });
                 res.errorCode = 0;
-                res.data = allcode;
+                res.data = allcodes;
                 resolve(res);
             }
         } catch (error) {
@@ -294,6 +296,38 @@ let handleGetDetailUsersServices = (accessToken) => {
     });
 };
 
+let filterAndPagingServices = (q) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const keyword = q.keyword ? q.keyword.trim() : '';
+            const where = {
+                [Op.or]: [
+                    { firstName: { [Op.like]: `%${keyword}%` } },
+                    { lastName: { [Op.like]: `%${keyword}%` } },
+                    { email: { [Op.like]: `%${keyword}%` } },
+                ],
+            };
+
+            const order = [['id', 'DESC']];
+            const attributes = { exclude: ['password'] };
+            const { count, rows } = await db.User.findAndCountAll({
+                where,
+                order,
+                offset: q.offset,
+                limit: q.limit,
+                attributes,
+                raw: true,
+                nest: true,
+            });
+            const totalPage = Math.ceil(Number(count) / Number(q.limit));
+
+            resolve({ errorCode: 0, data: { rows, count, totalPage } });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 module.exports = {
     handleUserLoginServices,
     getUserById,
@@ -303,4 +337,5 @@ module.exports = {
     getAllCodesService,
     registerServices,
     handleGetDetailUsersServices,
+    filterAndPagingServices,
 };
