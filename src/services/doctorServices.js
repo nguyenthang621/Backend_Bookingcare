@@ -2,6 +2,7 @@ import db from '../models';
 import _, { reject } from 'lodash';
 require('dotenv').config();
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 
 import { getAllCodesService } from '../services/userServices';
 import { sendEmailRemedyService, sendEmailCancelAppointmentService } from '../services/emailServices';
@@ -373,6 +374,53 @@ let confirmRemedyServices = (data) => {
     });
 };
 
+let filterAndPagingServices = (q) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let { offset, limit, keyword, roleId } = q;
+            keyword = keyword ? keyword.trim() : '';
+            const where = {};
+            if (keyword) {
+                where[Op.or] = [
+                    { firstName: { [Op.like]: `%${keyword}%` } },
+                    { lastName: { [Op.like]: `%${keyword}%` } },
+                    { email: { [Op.like]: `%${keyword}%` } },
+                ];
+            }
+
+            if (roleId) {
+                where[Op.and] = [{ roleId: { [Op.like]: `${roleId}` } }];
+            }
+
+            const order = [['id', 'DESC']];
+            const attributes = { exclude: ['password'] };
+            const { count, rows } = await db.User.findAndCountAll({
+                where,
+                order,
+                offset: offset,
+                limit: limit,
+                order: [['createdAt', 'DESC']],
+                include: [
+                    { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                    { model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi'] },
+                    {
+                        model: db.Doctor_Infor,
+                        attributes: ['id', 'doctorId', 'specialtyId', 'nameClinic'],
+                    },
+                ],
+                attributes,
+                raw: true,
+                nest: true,
+            });
+            const totalPage = Math.ceil(Number(count) / Number(limit));
+
+            resolve({ errorCode: 0, data: { rows, count, totalPage } });
+        } catch (error) {
+            reject({ errorCode: 1, message: error });
+        }
+    });
+};
+
 module.exports = {
     getTopDoctorHomeService,
     getAllDoctorsServices,
@@ -382,4 +430,5 @@ module.exports = {
     getScheduleDoctorByDateService,
     getAppointmentDoctorByDateService,
     confirmRemedyServices,
+    filterAndPagingServices,
 };

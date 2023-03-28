@@ -6,7 +6,7 @@ require('dotenv').config();
 let postHandbookServices = (data, accessToken) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.title || !data.authors || !data.contentMarkdown || !data.image) {
+            if (!data.title || !data.authors || !data.contentHtml || !data.image) {
                 resolve({
                     errorCode: 1,
                     message: 'Missing parameter',
@@ -30,7 +30,7 @@ let postHandbookServices = (data, accessToken) => {
                     image: data.image,
                     authors: data.authors,
                     adviser: data.adviser,
-                    contentMarkdown: data.contentMarkdown,
+                    contentMarkdown: data.contentMarkdown || '',
                     contentHtml: data.contentHtml,
                 });
                 resolve({ errorCode: 0, message: 'Post success, waiting for approval' });

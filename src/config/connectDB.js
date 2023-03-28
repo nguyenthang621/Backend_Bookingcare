@@ -30,4 +30,4 @@ let connectDB = async () => {
         console.error('Unable to connect to the database:', error);
     }
 };
-module.exports = connectDB;
+module.exports = { connectDB, sequelize };

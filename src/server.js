@@ -1,7 +1,7 @@
 import express from 'express';
 import configViewsEngine from './config/viewsEngine';
 import initWebRoutes from './routes/router';
-import connectDB from './config/connectDB';
+import { connectDB } from './config/connectDB';
 import client from './config/connectRedis';
 import cors from 'cors';
 var cookieParser = require('cookie-parser');

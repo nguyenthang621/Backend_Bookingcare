@@ -54,18 +54,28 @@ let initWebRoutes = (app) => {
         doctorController.getAppointmentDoctorByDate,
     );
     router.post('/api/confirm-remedy', doctorController.confirmRemedy);
+    router.get('/api/filter-doctor', doctorController.filterAndPaging);
 
     //patient
     router.post('/api/patient-booking-appointment', patientController.postBookAppointment);
     router.post('/api/verify-appointment', patientController.verifyBookAppointment);
+    router.get('/api/search-all', patientController.searchAll);
+    router.get('/api/search-all', patientController.searchAll);
+
     // specialty
     router.post('/api/post-specialty', specialtyController.postSpecialty);
     router.get('/api/all-specialty', specialtyController.getAllSpecialty);
     router.get('/api/get-specialty-by-id', specialtyController.getSpecialtyById);
-    // detail clinic
+    router.get('/api/filter-paging-specialty', specialtyController.filterAndPagingSpecialty);
+    router.delete('/api/specialty/:id', middlewareController.verifyAdmin, specialtyController.deleteSpecialtyById);
+
+    // clinic
     router.post('/api/post-detail-clinic', clinicController.postDetailClinic);
     router.get('/api/get-all-clinic', clinicController.getAllClinic);
     router.get('/api/get-detail-clinic-by-id', clinicController.getDetailClinicById);
+    router.get('/api/filter-paging-clinic', clinicController.filterAndPagingClinic);
+    router.delete('/api/clinic/:id', middlewareController.verifyAdmin, clinicController.deleteClinicById);
+
     // handbook:
     router.post('/api/post-handbook', middlewareController.verifyDoctor, handbookController.postHandbook);
     router.get('/api/get-handbook', handbookController.getHandbook);

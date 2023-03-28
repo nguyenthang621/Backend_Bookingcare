@@ -1,7 +1,10 @@
 import db from '../models';
 import { sendEmailService } from '../services/emailServices';
+import { getAllCodesService } from '../services/userServices';
+// import sequelize from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { reject } from 'lodash';
+import { sequelize } from '../config/connectDB.js';
+import { Op } from 'sequelize';
 
 let builtURLEmail = (doctorId, uuid) => {
     let URL = '';
@@ -117,7 +120,72 @@ let verifyAppointmentServices = (data) => {
     });
 };
 
+const matchKey = (key, arr) => {
+    for (let item of arr) {
+        if (item.keyMap === key) return item.valueVi;
+    }
+    return 'Bác sĩ';
+};
+
+const searchAllServices = (keyword) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const results = {};
+            let doctors = [];
+            let clinics = [];
+            let specialtys = [];
+            if (keyword) {
+                doctors = await db.User.findAll({
+                    where: {
+                        [Op.or]: [
+                            { firstName: { [Op.like]: `%${keyword}%` }, lastName: { [Op.like]: `%${keyword}%` } },
+                        ],
+                        [Op.and]: [{ roleId: 'R2' }],
+                    },
+                    attributes: ['id', 'firstName', 'lastName', 'roleId', 'position'],
+                    raw: true,
+                    nest: true,
+                });
+                clinics = await db.Clinics.findAll({
+                    where: {
+                        [Op.or]: [{ nameClinic: { [Op.like]: `%${keyword}%` } }],
+                    },
+                    attributes: ['id', 'nameClinic', 'imageClinic'],
+                    raw: true,
+                    nest: true,
+                });
+                specialtys = await db.Specialty.findAll({
+                    where: {
+                        [Op.or]: [{ name: { [Op.like]: `%${keyword}%` } }],
+                    },
+                    attributes: ['id', 'name', 'image'],
+                    raw: true,
+                    nest: true,
+                });
+            }
+            let arrKeyCodePosition = await getAllCodesService('POSITION');
+            doctors = doctors.map((item) => {
+                let position = matchKey(item.position, arrKeyCodePosition?.data || []);
+
+                return { id: item.id, name: `${position}, ${item.firstName} ${item.lastName}` };
+            });
+            clinics = clinics.map((item) => {
+                return { id: item.id, name: item.nameClinic, image: item.imageClinic };
+            });
+            results.doctors = doctors;
+            results.clinics = clinics;
+            results.specialtys = specialtys;
+
+            if (!results) resolve({ errorCode: 1, message: 'Có lỗi xảy ra vui lòng thử lại.' });
+            resolve({ errorCode: 0, results });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 module.exports = {
     patientBookAppointmentServices,
     verifyAppointmentServices,
+    searchAllServices,
 };

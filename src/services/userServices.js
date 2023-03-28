@@ -299,31 +299,37 @@ let handleGetDetailUsersServices = (accessToken) => {
 let filterAndPagingServices = (q) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const keyword = q.keyword ? q.keyword.trim() : '';
-            const where = {
-                [Op.or]: [
+            let { offset, limit, keyword, roleId } = q;
+            keyword = keyword ? keyword.trim() : '';
+            const where = {};
+            if (keyword) {
+                where[Op.or] = [
                     { firstName: { [Op.like]: `%${keyword}%` } },
                     { lastName: { [Op.like]: `%${keyword}%` } },
                     { email: { [Op.like]: `%${keyword}%` } },
-                ],
-            };
+                ];
+            }
+
+            if (roleId) {
+                where[Op.and] = [{ roleId: { [Op.like]: `${roleId}` } }];
+            }
 
             const order = [['id', 'DESC']];
             const attributes = { exclude: ['password'] };
             const { count, rows } = await db.User.findAndCountAll({
                 where,
                 order,
-                offset: q.offset,
-                limit: q.limit,
+                offset: offset,
+                limit: limit,
                 attributes,
                 raw: true,
                 nest: true,
             });
-            const totalPage = Math.ceil(Number(count) / Number(q.limit));
+            const totalPage = Math.ceil(Number(count) / Number(limit));
 
             resolve({ errorCode: 0, data: { rows, count, totalPage } });
         } catch (error) {
-            reject(error);
+            reject({ errorCode: 1, message: error });
         }
     });
 };

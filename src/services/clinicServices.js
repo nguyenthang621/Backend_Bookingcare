@@ -1,5 +1,6 @@
 import _, { reject } from 'lodash';
 import db from '../models';
+import { Op } from 'sequelize';
 
 let postDetailClinicServices = async (data) => {
     return new Promise(async (resolve, reject) => {
@@ -22,13 +23,13 @@ let postDetailClinicServices = async (data) => {
     });
 };
 
-let getAllClinicServices = async (isGetImageClinic) => {
+let getAllClinicServices = async (isGetImageClinic, detail) => {
     return new Promise(async (resolve, reject) => {
         try {
             let data = {};
             if (isGetImageClinic) {
                 data = await db.Clinics.findAll({
-                    attributes: ['id', 'nameClinic', 'imageClinic'],
+                    attributes: { exclude: ['descriptionHtml', 'descriptionMarkdown'] },
                     raw: true,
                 });
             } else {
@@ -92,8 +93,57 @@ let getDetailClinicByIdServices = (id) => {
     });
 };
 
+let filterAndPagingServices = (q) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const keyword = q.keyword ? q.keyword.trim() : '';
+            const where = {
+                [Op.or]: [
+                    { nameClinic: { [Op.like]: `%${keyword}%` } },
+                    { addressClinic: { [Op.like]: `%${keyword}%` } },
+                ],
+            };
+
+            const order = [['id', 'DESC']];
+            const attributes = { exclude: ['descriptionHtml', 'descriptionMarkdown'] };
+            const { count, rows } = await db.Clinics.findAndCountAll({
+                where,
+                order,
+                offset: q.offset,
+                limit: q.limit,
+                attributes,
+                raw: true,
+                nest: true,
+            });
+            const totalPage = Math.ceil(Number(count) / Number(q.limit));
+
+            resolve({ errorCode: 0, data: { rows, count, totalPage } });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+const deleteClinicByIdServices = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!id) resolve({ errorCode: 1, message: 'Thiếu id phòng khám, vui lòng thử lại.' });
+            let clinic = await db.Clinics.findOne({ where: { id: id } });
+            if (clinic) {
+                await clinic.destroy();
+                resolve({ errorCode: 0, message: 'Xoá phòng khám thành công' });
+            }
+            resolve({ errorCode: 1, message: 'Không tìm thấy phòng khám, vui lòng load lại trang.' });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 module.exports = {
     postDetailClinicServices,
     getAllClinicServices,
     getDetailClinicByIdServices,
+    filterAndPagingServices,
+    deleteClinicByIdServices,
 };

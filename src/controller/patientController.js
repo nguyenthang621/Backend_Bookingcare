@@ -1,4 +1,8 @@
-import { patientBookAppointmentServices, verifyAppointmentServices } from '../services/patientServices';
+import {
+    patientBookAppointmentServices,
+    verifyAppointmentServices,
+    searchAllServices,
+} from '../services/patientServices';
 
 let postBookAppointment = async (req, res) => {
     try {
@@ -34,7 +38,26 @@ let verifyBookAppointment = async (req, res) => {
     }
 };
 
+let searchAll = async (req, res) => {
+    try {
+        let keyword = req.query.keyword || '';
+        let response = await searchAllServices(keyword.trim());
+        if (response && response.errorCode === 0) {
+            return res.status(200).json(response);
+        } else {
+            return res.status(400).json(response);
+        }
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            errorCode: 1,
+            message: 'Error from server',
+        });
+    }
+};
+
 module.exports = {
     postBookAppointment,
     verifyBookAppointment,
+    searchAll,
 };

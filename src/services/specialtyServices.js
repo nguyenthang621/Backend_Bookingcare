@@ -1,4 +1,5 @@
 import db from '../models';
+import { Op } from 'sequelize';
 
 let postSpecialtyServices = (data) => {
     return new Promise(async (resolve, reject) => {
@@ -72,8 +73,54 @@ let getSpecialtyByIdServices = (id, location) => {
     });
 };
 
+let filterAndPagingServices = (q) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const keyword = q.keyword ? q.keyword.trim() : '';
+            const where = {
+                [Op.or]: [{ name: { [Op.like]: `%${keyword}%` } }],
+            };
+
+            const order = [['id', 'DESC']];
+            const attributes = { exclude: ['descriptionHtml', 'descriptionMarkdown'] };
+            const { count, rows } = await db.Specialty.findAndCountAll({
+                where,
+                order,
+                offset: q.offset,
+                limit: q.limit,
+                attributes,
+                raw: true,
+                nest: true,
+            });
+            const totalPage = Math.ceil(Number(count) / Number(q.limit));
+
+            resolve({ errorCode: 0, data: { rows, count, totalPage } });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
+const deleteSpecialtyByIdServices = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!id) resolve({ errorCode: 1, message: 'Thiếu id chuyên khoa, vui lòng thử lại.' });
+            let specialty = await db.Specialty.findOne({ where: { id: id } });
+            if (specialty) {
+                await specialty.destroy();
+                resolve({ errorCode: 0, message: 'Xoá chuyên khoa thành công' });
+            }
+            resolve({ errorCode: 1, message: 'Không tìm thấy chuyên khoa, vui lòng load lại trang.' });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 module.exports = {
     postSpecialtyServices,
     getAllSpecialtyServices,
     getSpecialtyByIdServices,
+    filterAndPagingServices,
+    deleteSpecialtyByIdServices,
 };

@@ -101,15 +101,19 @@ let register = async (req, res) => {
 
 let handleFilterUser = async (req, res) => {
     try {
-        let { page, limit, keyword } = req.query;
+        let { page, limit, keyword, roleId } = req.query;
         const offset = !page || +page <= 1 ? 0 : (+page - 1) * limit;
         limit = +limit || 10;
-        let response = await userServices.filterAndPagingServices({ offset, limit, keyword });
+        roleId = roleId || '';
+        let response = await userServices.filterAndPagingServices({ offset, limit, keyword, roleId });
         if (response && response.errorCode === 0) return res.status(200).json(response);
         else {
-            return res.status(500).json(response);
+            return res.status(400).json(response);
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ errorCode: 1, message: 'Có lỗi xảy ra ở server' });
+    }
 };
 
 module.exports = {
