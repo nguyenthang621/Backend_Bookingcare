@@ -1,5 +1,5 @@
 import express from 'express';
-import homeController from '../controller/homeController';
+// import homeController from '../controller/homeController';
 import userController from '../controller/userController';
 import doctorController from '../controller/doctorController';
 import handbookController from '../controller/handbookController';
@@ -14,15 +14,6 @@ import middlewareController from '../middleware/middlewareController';
 let router = express.Router();
 
 let initWebRoutes = (app) => {
-    router.get('/', homeController.getHomePage);
-    router.get('/crud', homeController.createCRUD);
-
-    router.post('/post-crud', homeController.postCRUD);
-    router.get('/get-crud', homeController.getCRUD);
-    router.get('/get-user-edit/:id', homeController.getUserEdit);
-    router.post('/update-user', homeController.updateUser);
-    router.get('/delete-user/:id', homeController.deleteUser);
-
     // api user:
     router.post('/api/login', userController.handleLogin);
     router.get('/api/get-users', middlewareController.verifyToken, userController.handleGetUsers);
@@ -34,9 +25,10 @@ let initWebRoutes = (app) => {
 
     router.post('/api/refresh-token', JWTController.requestRefreshToken);
     router.post('/api/logout', JWTController.logoutUser);
-    router.get('/api/get-detail-users', middlewareController.verifyToken, userController.handleGetDetailUsers);
+    router.get('/api/get-detail-users/:id', userController.handleGetDetailUsers);
     router.get('/api/filter-user', middlewareController.verifyToken, userController.handleFilterUser);
 
+    router.post('/api/upload-image', userController.uploadImage);
     // delete schedule expired
     // router.post('/api/delete-schedule', middlewareController.verifyDoctor, doctorController.deleteSchedule);
 
@@ -82,6 +74,7 @@ let initWebRoutes = (app) => {
     router.post('/api/confirm-handbook', middlewareController.verifyAdmin, handbookController.confirmHandbook);
     router.post('/api/delete-handbook', middlewareController.verifyAdmin, handbookController.deleteHandbook);
     router.get('/api/check-queue-handbook', middlewareController.verifyDoctor, handbookController.checkQueueHandbook);
+    router.get('/api/paging-handbook', handbookController.pagingHandbook);
 
     // news:
     router.post('/api/post-news', middlewareController.verifyDoctor, newsController.postNews);

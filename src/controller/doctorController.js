@@ -8,7 +8,7 @@ let getTopDoctorHome = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(200).json({
+        return res.status(500).json({
             errorCode: 1,
             message: 'Error in server...',
         });
@@ -21,7 +21,7 @@ let getAllDoctors = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(200).json({ errorCode: 1, message: 'get all doctor fail' });
+        return res.status(400).json({ errorCode: 1, message: 'get all doctor fail' });
     }
 };
 
@@ -32,7 +32,7 @@ let saveDetailDoctor = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(200).json({ errorCode: 1, message: 'Save detail doctor fail' });
+        return res.status(400).json({ errorCode: 1, message: 'Save detail doctor fail' });
     }
 };
 
@@ -40,14 +40,14 @@ let getDetailDoctorById = async (req, res) => {
     try {
         let id = req.query.id;
         if (!id) {
-            return res.status(200).json({ errorCode: 1, message: 'missing parameter id' });
+            return res.status(400).json({ errorCode: 1, message: 'Missing parameter id' });
         } else {
             let data = await doctorServices.getDetailDoctorByIdServices(id);
             return res.status(200).json(data);
         }
     } catch (error) {
         console.log(error);
-        return res.status(200).json({ errorCode: 1, message: 'Get detail doctor fail' });
+        return res.status(500).json({ errorCode: 1, message: 'Get detail doctor fail' });
     }
 };
 
@@ -59,7 +59,7 @@ let saveScheduleDoctor = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(200).json({ errorCode: 1, message: 'save schedule doctor fail' });
+        return res.status(400).json({ errorCode: 1, message: 'save schedule doctor fail' });
     }
 };
 // let deleteSchedule = async (req, res) => {
@@ -81,7 +81,7 @@ let getScheduleDoctorByDate = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(200).json({ errorCode: 1, message: 'get schedule doctor fail' });
+        return res.status(400).json({ errorCode: 1, message: 'get schedule doctor fail' });
     }
 };
 let getAppointmentDoctorByDate = async (req, res) => {
@@ -94,7 +94,7 @@ let getAppointmentDoctorByDate = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(200).json({ errorCode: 1, message: 'get appointment doctor fail' });
+        return res.status(400).json({ errorCode: 1, message: 'get appointment doctor fail' });
     }
 };
 let confirmRemedy = async (req, res) => {
@@ -104,7 +104,7 @@ let confirmRemedy = async (req, res) => {
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(200).json({ errorCode: 1, message: 'Confirm remedy and send mail fail, pls again' });
+        return res.status(400).json({ errorCode: 1, message: 'Confirm remedy and send mail fail, pls again' });
     }
 };
 

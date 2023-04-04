@@ -45,11 +45,12 @@ let handleGetUsers = async (req, res) => {
 let handleGetDetailUsers = async (req, res) => {
     try {
         let accessToken = req.headers.accesstoken;
-        let response = await userServices.handleGetDetailUsersServices(accessToken);
+        let id = req.params.id;
+        let response = await userServices.handleGetDetailUsersServices(accessToken, id);
         return res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        return res.status(200).json({
+        return res.status(500).json({
             errorCode: 1,
             message: 'Error from server',
         });
@@ -62,18 +63,26 @@ let handleCreateUser = async (req, res) => {
         return res.status(200).json(message);
     } catch (error) {
         console.log(error);
-        res.status(200).json({ errorCode: 1, message: 'create fail, pls again' });
+        res.status(500).json({ errorCode: 1, message: 'create fail, pls again' });
     }
 };
 
 let handleUpdateUser = async (req, res) => {
-    let message = await userServices.updateUser(req.body);
-    return res.status(200).json(message);
+    try {
+        let message = await userServices.updateUser(req.body);
+        return res.status(200).json(message);
+    } catch (error) {
+        return res.status(500).json(message);
+    }
 };
 
 let handleDeleteUser = async (req, res) => {
-    let message = await userServices.deleteUser(req.body.id);
-    return res.status(200).json(message);
+    try {
+        let message = await userServices.deleteUser(req.body.id);
+        return res.status(200).json(message);
+    } catch (error) {
+        return res.status(500).json(message);
+    }
 };
 
 let getAllCodes = async (req, res) => {
@@ -95,7 +104,7 @@ let register = async (req, res) => {
         res.status(200).json(response);
     } catch (error) {
         console.log('register fail ', error);
-        res.status(200).json({ errorCode: 1, message: 'Register fail, pls again' });
+        res.status(400).json({ errorCode: 1, message: 'Register fail, pls again' });
     }
 };
 
@@ -116,6 +125,20 @@ let handleFilterUser = async (req, res) => {
     }
 };
 
+const uploadImage = async (req, res) => {
+    try {
+        console.log(req.body);
+        return res
+            .status(200)
+            .json(
+                'https://firebasestorage.googleapis.com/v0/b/bookingcare-6a74c.appspot.com/o/files%2Fuser%2Fimg6.jpg?alt=media&token=4433d646-f44d-4ae2-84a9-364b91c484c3',
+            );
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ errorCode: 1, message: 'Có lỗi xảy ra ở server' });
+    }
+};
+
 module.exports = {
     handleLogin,
     handleGetUsers,
@@ -126,4 +149,5 @@ module.exports = {
     register,
     handleGetDetailUsers,
     handleFilterUser,
+    uploadImage,
 };

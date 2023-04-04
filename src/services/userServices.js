@@ -1,6 +1,5 @@
 import db from '../models';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 
 const salt = bcrypt.genSaltSync(10);
@@ -61,13 +60,13 @@ let handleComparePassword = (email, password) => {
                 } else {
                     resolve({
                         errorCode: 1,
-                        message: 'password wrong',
+                        message: 'Mật khẩu sai.',
                     });
                 }
             } else {
                 resolve({
                     errorCode: 1,
-                    message: 'user is not found',
+                    message: 'Không tìm thấy người dùng này.',
                 });
             }
         } catch (error) {
@@ -111,13 +110,13 @@ let createUser = async (data) => {
             if (checkEmail) {
                 resolve({
                     errorCode: 1,
-                    message: 'your email is already in used, please try another email',
+                    message: 'Email này đã được đăng kí.',
                 });
             } else {
                 if (!data.email || !data.password || !data.firstName || !data.lastName || !data.address) {
                     resolve({
                         errorCode: 1,
-                        message: 'Fill in the missing user information, please fill in all the information',
+                        message: 'Điền đầy thủ thông tin.',
                     });
                 } else {
                     await db.User.create({
@@ -135,7 +134,7 @@ let createUser = async (data) => {
 
                     resolve({
                         errorCode: 0,
-                        message: 'create user done',
+                        message: 'Tạo người dùng thành công.',
                     });
                 }
             }
@@ -153,28 +152,48 @@ let registerServices = async (data) => {
             if (checkEmail) {
                 resolve({
                     errorCode: 1,
-                    message: 'your email is already in used, please try another email',
+                    message: 'Email này đã được sử dụng.',
                 });
             } else {
-                if (!data.email || !data.password || !data.confirmPassword) {
+                let arrValidate = [
+                    { value: 'firstName', text: 'Họ' },
+                    { value: 'lastName', text: 'Tên' },
+                    { value: 'email', text: 'email' },
+                    { value: 'phoneNumber', text: 'số điện thoại' },
+                    { value: 'password', text: 'mật khẩu' },
+                    { value: 'confirmPassword', text: 'xác nhận mật khẩu' },
+                ];
+                for (let item of arrValidate) {
+                    if (!data[item.value]) {
+                        resolve({
+                            errorCode: 1,
+                            message: `Vui lòng nhập đầy đủ thông tin, thiếu ${item.text}`,
+                        });
+                    }
+                }
+                // if (!data.firstName || !data.lastName ||!data.email || !data.password || !data.confirmPassword) {
+                //     resolve({
+                //         errorCode: 1,
+                //         message: 'Fill in the missing user information, please fill in all the information',
+                //     });
+                // } else
+                if (data.password !== data.confirmPassword) {
                     resolve({
                         errorCode: 1,
-                        message: 'Fill in the missing user information, please fill in all the information',
-                    });
-                } else if (data.password !== data.confirmPassword) {
-                    resolve({
-                        errorCode: 1,
-                        message: 'Confirm password wrong',
+                        message: 'Vui lòng xác nhận lại mật khẩu.',
                     });
                 } else {
                     await db.User.create({
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        phoneNumber: data.phoneNumber,
                         email: data.email,
                         password: hashPassword,
                         roleId: 'R3',
                     });
                     resolve({
                         errorCode: 0,
-                        message: 'Register done',
+                        message: 'Đăng kí thành công',
                     });
                 }
             }
@@ -199,11 +218,16 @@ let deleteUser = async (userId) => {
         try {
             if (!userId) resolve({ errorCode: 1, message: 'Không tìm thấy ID người dùng, hoặc người dùng đã bị xoá' });
             let user = await db.User.findOne({ where: { id: userId } });
+            let doctorInfor = await db.Doctor_Infor.findOne({ where: { doctorId: userId } });
             if (user) {
                 await user.destroy();
-                resolve({ errorCode: 0, message: 'delete user done!' });
+                if (doctorInfor) {
+                    await doctorInfor.destroy();
+                    resolve({ errorCode: 0, message: 'Xoá bác sĩ thành công.' });
+                }
+                resolve({ errorCode: 0, message: 'Xoá người dùng thành công.' });
             }
-            resolve({ errorCode: 1, message: 'user is not found' });
+            resolve({ errorCode: 1, message: 'Không tìm thấy người dùng trong hệ thống' });
         } catch (error) {
             reject(error);
         }
@@ -216,7 +240,7 @@ let updateUser = async (dataUserNew) => {
             if (!dataUserNew.id || !dataUserNew.roleId || !dataUserNew.position || !dataUserNew.gender) {
                 resolve({
                     errorCode: 1,
-                    message: 'missing parameter',
+                    message: 'Missing parameter',
                 });
             }
             let user = await db.User.findOne({ where: { id: dataUserNew.id } });
@@ -233,9 +257,9 @@ let updateUser = async (dataUserNew) => {
                     imageURL: dataUserNew.fileURL,
                 });
                 await user.save();
-                resolve({ errorCode: 0, message: 'update user done' });
+                resolve({ errorCode: 0, message: 'Cập nhật thông tin thành công.' });
             }
-            resolve({ errorCode: 1, message: 'update user FAIL' });
+            resolve({ errorCode: 1, message: 'Cập nhật thông tin thất bại' });
         } catch (error) {
             reject(error);
         }
@@ -248,7 +272,7 @@ let getAllCodesService = (typeInput) => {
             if (!typeInput) {
                 resolve({
                     errorCode: 1,
-                    message: "missing parameter 'type'",
+                    message: "Missing parameter 'type'",
                 });
             } else {
                 let res = {};
@@ -262,20 +286,10 @@ let getAllCodesService = (typeInput) => {
         }
     });
 };
-let handleGetDetailUsersServices = (accessToken) => {
+let handleGetDetailUsersServices = (accessToken, id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let userId = '';
-            if (accessToken) {
-                jwt.verify(accessToken, process.env.KEY_SECRET_ACCESS_TOKEN, (err, payload) => {
-                    if (err) {
-                        resolve({ errorCode: 1, message: 'token is not valid' });
-                    }
-                    userId = payload.id;
-                });
-            } else {
-                resolve({ errorCode: 1, message: 'You are not authenticated' });
-            }
+            let userId = id;
             if (userId) {
                 let dataUser = await db.User.findOne({
                     where: { id: userId },

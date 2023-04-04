@@ -29,7 +29,7 @@ let patientBookAppointmentServices = (data) => {
             ];
             for (let i = 0; i < listReq.length; i++) {
                 if (!data[listReq[i]]) {
-                    resolve({ errorCode: 0, message: `Missing ${listReq[i]}` });
+                    resolve({ errorCode: 1, message: `Missing ${listReq[i]}` });
                 }
             }
             let uuid = uuidv4();
@@ -45,7 +45,7 @@ let patientBookAppointmentServices = (data) => {
                 nest: true,
             });
             if (!user) {
-                resolve({ errorCode: 1, message: 'Booing a appointment FAIL' });
+                resolve({ errorCode: 1, message: 'Lỗi không tìm thấy người dùng.' });
             } else {
                 let created = await db.Booking.findOrCreate({
                     where: {
@@ -75,9 +75,9 @@ let patientBookAppointmentServices = (data) => {
                     nest: true,
                 });
                 if (created[1]) {
-                    resolve({ errorCode: 0, message: 'Booing a appointment SUCCESS' });
+                    resolve({ errorCode: 0, message: 'Đặt lịch hẹn thành công vui lòng kiểm tra Email để xác nhận.' });
                 } else {
-                    resolve({ errorCode: 0, message: 'Bác si đã có lịch hẹn với bệnh nhân này' });
+                    resolve({ errorCode: 0, message: 'Bác sĩ đã có lịch hẹn với bệnh nhân này' });
                 }
             }
         } catch (error) {

@@ -2,9 +2,10 @@ import express from 'express';
 import configViewsEngine from './config/viewsEngine';
 import initWebRoutes from './routes/router';
 import { connectDB } from './config/connectDB';
-import client from './config/connectRedis';
 import cors from 'cors';
-var cookieParser = require('cookie-parser');
+import { deleteExpiredSchedules } from './services/autoServices';
+const cookieParser = require('cookie-parser');
+const cron = require('node-cron');
 require('dotenv').config();
 
 let app = express();
@@ -35,6 +36,8 @@ configViewsEngine(app);
 initWebRoutes(app);
 
 connectDB();
+
+cron.schedule('0 0 * * *', deleteExpiredSchedules);
 
 let port = process.env.PORT || 8000;
 app.listen(port, () => {

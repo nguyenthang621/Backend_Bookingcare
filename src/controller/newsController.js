@@ -10,7 +10,7 @@ let postNews = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        return res.status(200).json({
+        return res.status(500).json({
             errorCode: 1,
             message: 'Error in server...',
         });
@@ -26,7 +26,7 @@ let getNews = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        return res.status(200).json({
+        return res.status(500).json({
             errorCode: 1,
             message: 'Error in server...',
         });
@@ -42,7 +42,7 @@ let confirmNews = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        return res.status(200).json({
+        return res.status(500).json({
             errorCode: 1,
             message: 'Error in server...',
         });
@@ -57,7 +57,7 @@ let deleteNews = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        return res.status(200).json({
+        return res.status(500).json({
             errorCode: 1,
             message: 'Error in server...',
         });
@@ -71,7 +71,7 @@ let checkQueueNews = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        return res.status(200).json({
+        return res.status(500).json({
             errorCode: 1,
             message: 'Error in server...',
         });

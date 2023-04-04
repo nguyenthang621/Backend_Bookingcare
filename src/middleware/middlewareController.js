@@ -9,16 +9,16 @@ const middlewareController = {
             if (accessToken) {
                 jwt.verify(accessToken, process.env.KEY_SECRET_ACCESS_TOKEN, (err, payload) => {
                     if (err) {
-                        return res.status(200).json({ errorCode: 1, message: 'token is not valid' });
+                        return res.status(200).json({ errorCode: 1, message: 'Token is not valid' });
                     }
                     req.payload = payload;
                     next();
                 });
             } else {
-                return res.status(200).json({ errorCode: 1, message: 'You are not authenticated' });
+                return res.status(403).json({ errorCode: 1, message: 'You are not authenticated' });
             }
         } catch (error) {
-            return res.status(200).json({ errorCode: 1, message: 'error:You are not authenticated' });
+            return res.status(401).json({ errorCode: 1, message: 'error:You are not authenticated' });
         }
     },
 
@@ -29,10 +29,10 @@ const middlewareController = {
                 if (dataToken.roleId === 'R2' || dataToken.roleId === 'R1') {
                     next();
                 } else {
-                    return res.status(200).json({ errorCode: 1, message: 'You are not doctor or admin' });
+                    return res.status(403).json({ errorCode: 1, message: 'You are not doctor or admin' });
                 }
             } catch (error) {
-                return res.status(200).json({ errorCode: 1, message: 'You are not doctor or admin' });
+                return res.status(401).json({ errorCode: 1, message: 'You are not doctor or admin' });
             }
         });
     },
@@ -45,10 +45,10 @@ const middlewareController = {
                 if (dataToken.roleId === 'R1') {
                     next();
                 } else {
-                    return res.status(200).json({ errorCode: 1, message: 'You are not admin' });
+                    return res.status(403).json({ errorCode: 1, message: 'You are not admin' });
                 }
             } catch (error) {
-                return res.status(200).json({ errorCode: 1, message: 'You are not admin' });
+                return res.status(401).json({ errorCode: 1, message: 'You are not admin' });
             }
         });
     },

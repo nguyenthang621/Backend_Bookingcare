@@ -85,7 +85,30 @@ let getHandbookServices = (id, type, statusId) => {
             else if ((id && type === 'detail') || id) {
                 data = await db.Handbook.findOne({
                     where: { id: id },
+                    include: [
+                        {
+                            model: db.User,
+                            as: 'senderData',
+                            attributes: ['id', 'firstName', 'lastName', 'position'],
+                        },
+                    ],
+                    raw: true,
+                    nest: true,
                 });
+                let idAdvisers = data?.adviser?.split(',');
+                if (idAdvisers) {
+                    data.adviserData = await Promise.all(
+                        idAdvisers.map(async (item) => {
+                            const user = await db.User.findOne({
+                                where: { id: item },
+                                attributes: ['firstName', 'lastName', 'position'],
+                                raw: true,
+                                nest: true,
+                            });
+                            return user;
+                        }),
+                    );
+                }
 
                 // for api manage
             } else if (type === 'manage' && statusId) {
@@ -134,10 +157,12 @@ let deleteHandbookServices = (id) => {
                 let handbook = await db.Handbook.findOne({
                     where: { id: id },
                 });
+                let statusUpdate = handbook.dataValues.statusId === 'S3' ? 'S2' : 'S3';
+                let message = statusUpdate === 'S3' ? 'Xoá bài viết thành công' : 'Đăng lại bài viết thành công';
                 if (handbook) {
-                    await handbook.update({ statusId: 'S3' });
+                    await handbook.update({ statusId: statusUpdate });
                     await handbook.save();
-                    resolve({ errorCode: 0, message: 'Not accept handbook success' });
+                    resolve({ errorCode: 0, message: message });
                 } else {
                     resolve({ errorCode: 1, message: 'Not found handbook' });
                 }
@@ -167,10 +192,33 @@ let checkQueueHandbookServices = () => {
     });
 };
 
+let PagingHandbookServices = (q) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const order = [['id', 'DESC']];
+
+            const { count, rows } = await db.Handbook.findAndCountAll({
+                where: { statusId: q.statusId },
+                order,
+                offset: q.offset,
+                limit: q.limit,
+                raw: true,
+                nest: true,
+            });
+            const totalPage = Math.ceil(Number(count) / Number(q.limit));
+
+            resolve({ errorCode: 0, data: { rows, count, totalPage } });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
+
 module.exports = {
     postHandbookServices,
     getHandbookServices,
     confirmHandbookServices,
     deleteHandbookServices,
     checkQueueHandbookServices,
+    PagingHandbookServices,
 };

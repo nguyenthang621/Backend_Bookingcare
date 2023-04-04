@@ -77,7 +77,7 @@ let getNewsServices = (id, type, statusId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let data = {};
-            let dataAdviser = [];
+
             if (!statusId) {
                 resolve({
                     errorCode: 1,
@@ -88,7 +88,30 @@ let getNewsServices = (id, type, statusId) => {
             else if ((id && type === 'detail') || id) {
                 data = await db.News.findOne({
                     where: { id: id },
+                    include: [
+                        {
+                            model: db.User,
+                            as: 'senderDataNews',
+                            attributes: ['id', 'firstName', 'lastName', 'position'],
+                        },
+                    ],
+                    raw: true,
+                    nest: true,
                 });
+                let idAdvisers = data?.adviser?.split(',');
+                if (idAdvisers) {
+                    data.adviserData = await Promise.all(
+                        idAdvisers.map(async (item) => {
+                            const user = await db.User.findOne({
+                                where: { id: item },
+                                attributes: ['firstName', 'lastName', 'position'],
+                                raw: true,
+                                nest: true,
+                            });
+                            return user;
+                        }),
+                    );
+                }
 
                 // for api manage
             } else if (type === 'manage' && statusId) {
@@ -121,7 +144,7 @@ let getNewsServices = (id, type, statusId) => {
             } else {
                 resolve({
                     errorCode: 1,
-                    message: 'not found news',
+                    message: 'Not found news',
                 });
             }
         } catch (error) {
@@ -141,10 +164,13 @@ let deleteNewsServices = (id) => {
                 let news = await db.News.findOne({
                     where: { id: id },
                 });
+
+                let statusUpdate = news.dataValues.statusId === 'S3' ? 'S2' : 'S3';
+                let message = statusUpdate === 'S3' ? 'Xoá bài viết thành công' : 'Đăng lại bài viết thành công';
                 if (news) {
-                    await news.update({ statusId: 'S3' });
+                    await news.update({ statusId: statusUpdate });
                     await news.save();
-                    resolve({ errorCode: 0, message: 'Delete news success' });
+                    resolve({ errorCode: 0, message: message });
                 } else {
                     resolve({ errorCode: 1, message: 'Not found news' });
                 }

@@ -11,7 +11,7 @@ let postSpecialtyServices = (data) => {
                 await db.Specialty.create({
                     name: data.specialty,
                     descriptionHtml: data.descriptionHtml,
-                    descriptionMarkdown: data.descriptionMarkdown,
+                    descriptionMarkdown: data.descriptionMarkdown || '',
                     image: data.image,
                 });
             }

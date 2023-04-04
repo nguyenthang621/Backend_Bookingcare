@@ -1,18 +1,20 @@
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../services/jwt_Services';
 import _ from 'lodash';
 import client from '../config/connectRedis';
-var createError = require('http-errors');
 
+// refresh AT và RT
 let requestRefreshToken = async (req, res) => {
     try {
         let refreshToken = req.cookies?.refreshToken;
-
         if (!refreshToken || _.isEmpty(refreshToken)) {
-            return res.status(200).json({ errorCode: 1, message: 'You are not authenticated' });
+            return res.status(403).json({ errorCode: 1, message: 'You are not authenticated' });
+            // return res.redirect('/login');
+        }
+        let payload = await verifyRefreshToken(refreshToken);
+        if (!payload || _.isEmpty(payload)) {
+            return res.status(403).json({ errorCode: 1, message: 'Token không đúng hoặc đã hết hạn.' });
         }
 
-        let payload = await verifyRefreshToken(refreshToken);
-        // create newAccessToken and newRefreshToken:
         if (payload && payload?.iat && payload?.exp && !_.isEmpty(payload)) {
             delete payload.iat;
             delete payload.exp;
@@ -31,13 +33,13 @@ let requestRefreshToken = async (req, res) => {
             accessToken: newAccessToken,
         });
     } catch (error) {
-        return res.status(200).json({ errorCode: 1, message: 'Error from server' });
+        return res.status(500).json({ errorCode: 1, message: 'Error from server' });
     }
 };
 
 let logoutUser = async (req, res) => {
     try {
-        let refreshToken = req.body.refreshToken;
+        let refreshToken = req.cookies?.refreshToken;
         if (!refreshToken) {
             return res.status(200).json({
                 errorCode: 0,
@@ -45,8 +47,13 @@ let logoutUser = async (req, res) => {
             });
         }
         let payload = await verifyRefreshToken(refreshToken);
-        let userId = payload.id;
-
+        let userId = payload?.id;
+        if (!userId) {
+            return res.status(200).json({
+                errorCode: 0,
+                message: 'Bạn không phải chính chủ',
+            });
+        }
         client.del(userId.toString(), (err, reply) => {
             if (err)
                 return res.status(402).json({

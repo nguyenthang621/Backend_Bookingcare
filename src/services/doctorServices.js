@@ -49,6 +49,7 @@ let getAllDoctorsServices = () => {
         try {
             let allDoctor = await db.User.findAll({
                 where: { roleId: 'R2' },
+                order: [['createdAt', 'DESC']],
                 attributes: {
                     exclude: [
                         'email',
@@ -85,23 +86,22 @@ let saveDetailDoctorService = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             const listData = [
-                'doctorId',
-                'contentHTML',
-                // 'contentMarkdown',
-                'selectedPrice',
-                'selectedPayment',
-                'selectedProvince',
-                'selectedSpecialty',
-                'nameClinic',
-                'addressClinic',
-                'note',
+                { field: 'doctorId', text: 'Chưa chọn bác sĩ' },
+                { field: 'selectedProvince', text: 'Chưa chọn tỉnh thành' },
+                { field: 'nameClinic', text: 'Chưa chọn phòng khám' },
+                { field: 'addressClinic', text: 'Chưa chọn địa chỉ phòng khám' },
+                { field: 'selectedPrice', text: 'Chưa chọn giá khám' },
+                { field: 'selectedPayment', text: 'Chưa chọn phương thức thanh toán' },
+                { field: 'selectedSpecialty', text: 'Chưa chọn chuyên khoa' },
+                { field: 'description', text: 'Chưa điền thông tin giới thiệu bác sĩ' },
+                { field: 'contentHTML', text: 'Chưa điền thông tin bác sĩ' },
                 // 'isChange',
             ];
             for (let i = 0; i < listData.length; i++) {
-                if (!data[listData[i]]) {
+                if (!data[listData[i]['field']]) {
                     resolve({
                         errorCode: 1,
-                        message: `missing ${listData[i]}`,
+                        message: listData[i]['text'],
                     });
                 }
             }
@@ -110,7 +110,6 @@ let saveDetailDoctorService = (data) => {
             if (doctor) {
                 await doctor.update({
                     contentHTML: data.contentHTML,
-                    // contentMarkdown: 'contentMarkdown',
                     description: data.description,
                     doctorId: data.doctorId,
                 });
@@ -118,7 +117,6 @@ let saveDetailDoctorService = (data) => {
             } else {
                 await db.Markdown.create({
                     contentHTML: data.contentHTML,
-                    // contentMarkdown: 'contentMarkdown',
                     description: data.description,
                     doctorId: data.doctorId,
                 });

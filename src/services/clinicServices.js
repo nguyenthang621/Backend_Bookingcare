@@ -23,19 +23,24 @@ let postDetailClinicServices = async (data) => {
     });
 };
 
-let getAllClinicServices = async (isGetImageClinic, detail) => {
+let getAllClinicServices = async (isGetImageClinic, limit) => {
     return new Promise(async (resolve, reject) => {
         try {
             let data = {};
-            if (isGetImageClinic) {
+            if (limit === 'ALL') limit = null;
+            console.log(isGetImageClinic);
+            if (!isGetImageClinic || isGetImageClinic === 'undefined') {
                 data = await db.Clinics.findAll({
-                    attributes: { exclude: ['descriptionHtml', 'descriptionMarkdown'] },
+                    attributes: ['id', 'nameClinic'],
                     raw: true,
                 });
             } else {
                 data = await db.Clinics.findAll({
-                    attributes: ['id', 'nameClinic'],
+                    limit,
+                    order: [['createdAt', 'DESC']],
+                    attributes: { exclude: ['descriptionHtml', 'descriptionMarkdown'] },
                     raw: true,
+                    nest: true,
                 });
             }
 

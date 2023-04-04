@@ -10,11 +10,11 @@ let postBookAppointment = async (req, res) => {
         if (response && response.errorCode === 0) {
             return res.status(200).json(response);
         } else {
-            return res.status(200).json(response);
+            return res.status(400).json(response);
         }
     } catch (e) {
         console.log(e);
-        return res.status(200).json({
+        return res.status(501).json({
             errorCode: 1,
             message: 'Post book appointment FAIL',
         });
@@ -27,11 +27,11 @@ let verifyBookAppointment = async (req, res) => {
         if (response && response.errorCode === 0) {
             return res.status(200).json(response);
         } else {
-            return res.status(200).json(response);
+            return res.status(400).json(response);
         }
     } catch (e) {
         console.log(e);
-        return res.status(200).json({
+        return res.status(500).json({
             errorCode: 1,
             message: 'Error from server',
         });
