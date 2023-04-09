@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(cors({ credentials: true, origin: true }));
 app.use(function (req, res, next) {
     // Website you wish to allow to connect
-    // res.setHeader('Access-Control-Allow-Origin', process.env.URL_REACT);
+    res.setHeader('Access-Control-Allow-Origin', process.env.URL_REACT);
     // res.setHeader('Access-Control-Allow-Origin', ['*']);
 
     // Request methods you wish to allow
