@@ -19,6 +19,7 @@ let handleUserLoginServices = (email, password) => {
                 resolve({ ...userData });
             }
         } catch (error) {
+            console.log('error:', error);
             reject(error);
         }
     });

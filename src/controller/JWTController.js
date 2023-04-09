@@ -40,8 +40,9 @@ let requestRefreshToken = async (req, res) => {
 let logoutUser = async (req, res) => {
     try {
         let refreshToken = req.cookies?.refreshToken;
+        console.log(refreshToken);
         if (!refreshToken) {
-            return res.status(200).json({
+            return res.status(400).json({
                 errorCode: 0,
                 message: 'Missing refreshToken',
             });
@@ -49,7 +50,7 @@ let logoutUser = async (req, res) => {
         let payload = await verifyRefreshToken(refreshToken);
         let userId = payload?.id;
         if (!userId) {
-            return res.status(200).json({
+            return res.status(400).json({
                 errorCode: 0,
                 message: 'Bạn không phải chính chủ',
             });

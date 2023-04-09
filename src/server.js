@@ -14,6 +14,7 @@ app.use(cors({ credentials: true, origin: true }));
 app.use(function (req, res, next) {
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', process.env.URL_REACT);
+    // res.setHeader('Access-Control-Allow-Origin', '*');
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -39,7 +40,7 @@ connectDB();
 
 cron.schedule('0 0 * * *', deleteExpiredSchedules);
 
-let port = process.env.PORT || 8000;
+let port = process.env.PORT;
 app.listen(port, () => {
     console.log('backend nodejs running on port ' + port);
 });

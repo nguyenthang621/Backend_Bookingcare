@@ -8,6 +8,7 @@ let handleLogin = async (req, res) => {
         return res.status(200).json({ errorCode: 1, message: 'Missing form' });
     }
     let dataUser = await userController.handleUserLoginServices(email, password);
+
     if (dataUser && dataUser.errorCode === 0) {
         let payload = dataUser.user;
         const accessToken = await signAccessToken(payload);
@@ -21,7 +22,7 @@ let handleLogin = async (req, res) => {
         });
         return res.status(200).json({ errorCode: 0, accessToken });
     } else {
-        return res.status(200).json(dataUser);
+        return res.status(400).json(dataUser);
     }
 };
 
