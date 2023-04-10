@@ -23,7 +23,7 @@ let requestRefreshToken = async (req, res) => {
         const newRefreshToken = await signRefreshToken(payload);
 
         res.cookie('refreshToken', newRefreshToken, {
-            // httpOnly:true,
+            httpOnly: true,
             secure: false,
             path: '/',
             sameSite: 'strict',

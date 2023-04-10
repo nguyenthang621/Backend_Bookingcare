@@ -15,7 +15,7 @@ let handleLogin = async (req, res) => {
         const refreshToken = await signRefreshToken(payload);
 
         res.cookie('refreshToken', refreshToken, {
-            // httpOnly:true,
+            httpOnly: true,
             secure: false,
             path: '/',
             sameSite: 'strict',
