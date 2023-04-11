@@ -14,13 +14,13 @@ let handleLogin = async (req, res) => {
         const accessToken = await signAccessToken(payload);
         const refreshToken = await signRefreshToken(payload);
 
-        res.cookie('refreshToken', refreshToken, {
-            // httpOnly: true,
-            // secure: false,
-            path: '/',
-            // sameSite: 'strict',
-        });
-        return res.status(200).json({ errorCode: 0, accessToken });
+        // res.cookie('refreshToken', refreshToken, {
+        //     httpOnly: true,
+        //     secure: false,
+        //     path: '/',
+        //     sameSite: 'strict',
+        // });
+        return res.status(200).json({ errorCode: 0, accessToken, refreshToken });
     } else {
         return res.status(400).json(dataUser);
     }

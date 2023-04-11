@@ -22,15 +22,16 @@ let requestRefreshToken = async (req, res) => {
         const newAccessToken = await signAccessToken(payload);
         const newRefreshToken = await signRefreshToken(payload);
 
-        res.cookie('refreshToken', newRefreshToken, {
-            // httpOnly: true,
-            // secure: false,
-            path: '/',
-            // sameSite: 'strict',
-        });
+        // res.cookie('refreshToken', newRefreshToken, {
+        //     httpOnly: true,
+        //     secure: false,
+        //     path: '/',
+        //     sameSite: 'strict',
+        // });
         return res.status(200).json({
             errorCode: 0,
             accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
         });
     } catch (error) {
         return res.status(500).json({ errorCode: 1, message: 'Error from server' });
