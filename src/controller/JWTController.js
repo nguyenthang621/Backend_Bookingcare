@@ -23,10 +23,10 @@ let requestRefreshToken = async (req, res) => {
         const newRefreshToken = await signRefreshToken(payload);
 
         res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: false,
+            // httpOnly: true,
+            // secure: false,
             path: '/',
-            sameSite: 'strict',
+            // sameSite: 'strict',
         });
         return res.status(200).json({
             errorCode: 0,
@@ -42,7 +42,7 @@ let logoutUser = async (req, res) => {
         let refreshToken = req.cookies?.refreshToken;
         console.log(refreshToken);
         if (!refreshToken) {
-            return res.status(400).json({
+            return res.clearCookie('accessToken').status(400).json({
                 errorCode: 0,
                 message: 'Missing refreshToken',
             });
@@ -61,7 +61,7 @@ let logoutUser = async (req, res) => {
                     errorCode: 1,
                     message: 'you are not a user please try again',
                 });
-            return res.status(200).json({
+            return res.clearCookie('accessToken').status(200).json({
                 errorCode: 0,
                 message: 'Logout done',
             });

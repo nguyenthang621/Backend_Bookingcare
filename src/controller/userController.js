@@ -15,10 +15,10 @@ let handleLogin = async (req, res) => {
         const refreshToken = await signRefreshToken(payload);
 
         res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: false,
+            // httpOnly: true,
+            // secure: false,
             path: '/',
-            sameSite: 'strict',
+            // sameSite: 'strict',
         });
         return res.status(200).json({ errorCode: 0, accessToken });
     } else {
