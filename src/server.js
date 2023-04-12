@@ -12,8 +12,13 @@ let app = express();
 app.use(cookieParser());
 app.use(cors({ credentials: true, origin: true }));
 app.use(function (req, res, next) {
+    const cors = {
+        origin: [process.env.URL_REACT, process.env.URL_REACT_DNS],
+        default: 'http://localhost:5000',
+    };
+    const origin = cors.origin.includes(req.header('origin').toLowerCase()) ? req.headers.origin : cors.default;
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', process.env.URL_REACT);
+    res.setHeader('Access-Control-Allow-Origin', origin);
     // res.setHeader('Access-Control-Allow-Origin', ['*']);
 
     // Request methods you wish to allow
