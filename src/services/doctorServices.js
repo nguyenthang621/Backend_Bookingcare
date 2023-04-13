@@ -348,11 +348,11 @@ let confirmRemedyServices = (data) => {
                     if (data && data.isDestroyAppointment) {
                         appointment.statusId = 'S4';
                         await appointment.save();
-                        await sendEmailCancelAppointmentService(data, 'http://localhost:5000/home');
+                        await sendEmailCancelAppointmentService(data, process.env.URL_REACT);
                     } else {
                         appointment.statusId = 'S3';
                         await appointment.save();
-                        await sendEmailRemedyService(data, 'http://localhost:5000/home');
+                        await sendEmailRemedyService(data, process.env.URL_REACT);
                     }
                     resolve({
                         errorCode: 0,

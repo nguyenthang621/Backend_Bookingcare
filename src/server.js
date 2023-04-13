@@ -18,7 +18,7 @@ app.use(function (req, res, next) {
     // };
     // const origin = cors.origin.includes(req.header('origin').toLowerCase()) ? req.headers.origin : cors.default;
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', process.env.URL_REACT_DNS);
+    res.setHeader('Access-Control-Allow-Origin', process.env.URL_REACT);
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
