@@ -1,9 +1,9 @@
 require('dotenv').config();
 import { createClient } from 'redis';
 
-const client = createClient({
-    URL: 'redis-18099.c257.us-east-1-3.ec2.cloud.redislabs.com:18099',
-});
+// const client = createClient({
+//     URL: 'redis-18099.c257.us-east-1-3.ec2.cloud.redislabs.com:18099',
+// });
 // const client = createClient({
 //     port: process.env.REDIS_PORT,
 //     host: process.env.REDIS_HOST,
@@ -20,6 +20,13 @@ const client = createClient({
 //     //-------------------------------
 //     // url: process.env.REDIS_URL,
 // });
+const client = createClient({
+    password: 'rO34rRMhVcc8iQseqOWRe84TFDN1rpit',
+    socket: {
+        host: 'redis-18099.c257.us-east-1-3.ec2.cloud.redislabs.com',
+        port: 18099,
+    },
+});
 client.ping((err, pong) => {
     console.log('ping: ', pong);
 });
