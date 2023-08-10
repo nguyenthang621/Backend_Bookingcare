@@ -5,7 +5,7 @@ import { signAccessToken, signRefreshToken } from '../services/jwt_Services';
 let handleLogin = async (req, res) => {
     let { email, password } = req.body;
     if (!email || !password) {
-        return res.status(200).json({ errorCode: 1, message: 'Missing form' });
+        return res.status(404).json({ errorCode: 1, message: 'Missing form' });
     }
     let dataUser = await userController.handleUserLoginServices(email, password);
 
@@ -13,13 +13,6 @@ let handleLogin = async (req, res) => {
         let payload = dataUser.user;
         const accessToken = await signAccessToken(payload);
         const refreshToken = await signRefreshToken(payload);
-
-        // res.cookie('refreshToken', refreshToken, {
-        //     httpOnly: true,
-        //     secure: false,
-        //     path: '/',
-        //     sameSite: 'strict',
-        // });
         return res.status(200).json({ errorCode: 0, accessToken, refreshToken });
     } else {
         return res.status(400).json(dataUser);
@@ -29,7 +22,7 @@ let handleLogin = async (req, res) => {
 let handleGetUsers = async (req, res) => {
     let userId = req.query.id; // all or id
     if (!userId) {
-        return res.status(200).json({
+        return res.status(400).json({
             errorCode: 1,
             message: 'missing required parameter',
             users: [],

@@ -15,7 +15,7 @@ let handleUserLoginServices = (email, password) => {
                 resolve(data);
             } else {
                 userData.errorCode = 1;
-                userData.message = 'user is not found';
+                userData.message = 'User is not found';
                 resolve({ ...userData });
             }
         } catch (error) {
