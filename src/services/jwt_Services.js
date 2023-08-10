@@ -8,7 +8,7 @@ const signAccessToken = async (payload) => {
     return new Promise(async (resolve, reject) => {
         const key = process.env.KEY_SECRET_ACCESS_TOKEN;
         const options = {
-            expiresIn: '300s',
+            expiresIn: '3d',
         };
         jwt.sign(payload, key, options, (err, accessToken) => {
             if (err) {
