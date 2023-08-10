@@ -2,7 +2,7 @@ require('dotenv').config();
 import { createClient } from 'redis';
 
 const client = createClient({
-    URL: 'rediss://red-cj9pg7pduelc73d0glv0:KzdbVNf5vpzfCLROgdfpjmx3rpOy5ZEn@singapore-redis.render.com:6379',
+    URL: 'redis-18099.c257.us-east-1-3.ec2.cloud.redislabs.com:18099',
 });
 // const client = createClient({
 //     port: process.env.REDIS_PORT,
